@@ -53,3 +53,20 @@ Configuration keys and command identifiers must remain language-independent.
 
 Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn` after validation.
 The VSIX is for local testing until the publisher identity and distribution plan are confirmed.
+
+## Real VS Code smoke test
+
+After packaging, run `node scripts/host-smoke.cjs <package.vsix> <path-to-Code-executable> <locale>`
+using Node.js 24 or later. Supported locales are `en`, `zh-cn` and `zh-tw`.
+The script installs the VSIX into a fresh isolated profile, installs the official Chinese language pack
+when needed, and starts a real extension host with a local renderer debugging port.
+It checks ten rendered color menu items, literal array text navigation, live border/radius/opacity
+changes including zero, localized regex and save prompts, and regex preservation after recoloring.
+Screenshots, renderer styles, menu labels and the actual saved rule remain under ignored
+`__host-smoke/`; failed runs are preserved. The test closes its own window automatically.
+Personal VS Code profiles, settings and windows are not used by this test.
+
+The Windows VS Code 1.108.2 English run has passed. The Simplified Chinese run currently
+fails the actual display-locale assertion (`en` instead of `zh-cn`) despite the installed
+language pack; Chinese host verification remains open. Translation resource/stub tests
+do not replace this check.
