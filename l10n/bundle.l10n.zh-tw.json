@@ -23,5 +23,7 @@
   "Ignore case": "忽略大小寫模式",
   "Match case": "區分大小寫模式",
   "Match whole words": "完整單字比對模式",
-  "Partial matching": "部分比對模式"
+  "Partial matching": "部分比對模式",
+  "Add at least one color to textmarker.highlightColors before cycling highlight colors.": "請先在 textmarker.highlightColors 中新增至少一種色彩, 再循環切換醒目提示色彩.",
+  "textmarker.highlightColors must contain valid CSS colors.": "textmarker.highlightColors 必須包含有效的 CSS 色彩."
 }

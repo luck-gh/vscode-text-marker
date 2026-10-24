@@ -6,6 +6,8 @@ import ConfigurationTargetPicker from './config-target-picker';
 import * as Const from './const';
 import {Highlight} from './entities/highlight';
 
+const rgba = require('color-rgba');
+
 export default class ConfigStore {
     private readonly workspace: typeof vscode.workspace;
     private readonly configTargetPicker: ConfigurationTargetPicker;
@@ -16,7 +18,11 @@ export default class ConfigStore {
     }
 
     get highlightColors() {
-        return this.get<string[]>('highlightColors');
+        const colours = this.get<string[]>('highlightColors');
+        if (!Array.isArray(colours) || colours.some(colour => typeof colour !== 'string' || !rgba(colour).length)) {
+            throw new Error(vscode.l10n.t('textmarker.highlightColors must contain valid CSS colors.'));
+        }
+        return colours;
     }
 
     get defaultHighlightColor() {

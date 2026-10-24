@@ -5,6 +5,13 @@ All notable changes to "Text Marker Custom" extension will be documented in this
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-10-24
+### Changed
+
+- Change `textmarker.toggleHighlight` to add highlights or cycle existing rules through the configured palette, preserving rule identity and matching options. Use `textmarker.unhighlight` to remove a rule.
+- Rename the command in English, Simplified Chinese and Traditional Chinese; keep command IDs and settings unchanged.
+- Expand both README recommendation blocks with per-setting explanations and aligned JSONC comments. Clarify the original animations show the former toggle behavior.
+
 ## [1.12.0] - 2026-10-24
 ### Changed
 - Use the independent `luck-gh.text-marker-custom` identity and Text Marker Custom display name.

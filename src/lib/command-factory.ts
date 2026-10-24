@@ -60,7 +60,7 @@ export default class CommandFactory {
     }
 
     createToggleHighlightCommand() {
-        return new ToggleHighlightCommand(this.getMatchingModeRegistry(), this.getTextLocationRegistry(), this.getDecorationRegistry(), this.getDecorationTypeRegistry(), this.getWindowComponent());
+        return new ToggleHighlightCommand(this.getMatchingModeRegistry(), this.getTextLocationRegistry(), this.getDecorationRegistry(), this.getDecorationTypeRegistry(), this.getWindowComponent(), this.getConfigStore());
     }
 
     createHighlightUsingRegex() {

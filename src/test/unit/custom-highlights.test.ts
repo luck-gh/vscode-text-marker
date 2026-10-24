@@ -10,6 +10,7 @@ import {DecorationTypeRegistry} from '../../lib/decoration/decoration-type-regis
 import TextDecorator from '../../lib/decoration/text-decorator';
 import DecorationOperator from '../../lib/decoration/decoration-operator';
 import DecorationOperatorFactory from '../../lib/decoration/decoration-operator-factory';
+import ToggleHighlightCommand from '../../lib/commands/toggle-highlight';
 import SetHighlightColourCommand from '../../lib/commands/set-highlight-colour';
 import TextEditor from '../../lib/vscode/text-editor';
 import WindowComponent from '../../lib/vscode/window';
@@ -41,10 +42,72 @@ function createHarness() {
     const operator = new DecorationOperator([editor], registry, new TextDecorator(locations, types));
     const factory = mockType<DecorationOperatorFactory>({createForVisibleEditors: () => operator});
     const choose = (color: string) => new SetHighlightColourCommand(color, modes, locations, registry, factory).execute(editor as TextEditor);
-    return {config, patterns, registry, locations, types, editor, rendered, operator, choose, getDisposed: () => disposed};
+    const cycle = () => new ToggleHighlightCommand(modes, locations, registry, types,
+        mockType<WindowComponent>({visibleTextEditors: [editor]}), config).execute(editor);
+    return {cycle, config, patterns, registry, locations, types, editor, rendered, operator, choose, getDisposed: () => disposed};
 }
 
 suite('Custom highlight controls', () => {
+    test('cycles every palette color, wraps and preserves literal array rule identity', () => {
+        const h = createHarness();
+        h.cycle();
+        const first = h.registry.retrieveAll()[0];
+        for (const colour of [...colors.slice(1), colors[0], colors[1]]) {
+            h.cycle();
+            const [current] = h.registry.retrieveAll();
+            assert.equal(current.colour, colour);
+            assert.equal(current.id, first.id);
+            assert.strictEqual(current.pattern, first.pattern);
+            assert.equal(current.pattern.phrase, 'au8_data[0]');
+            assert.equal(h.registry.retrieveAll().length, 1);
+        }
+    });
+    test('cycles regex rules without changing their expression, case or whole-match options', () => {
+        const h = createHarness();
+        h.operator.addDecoration(h.patterns.create({type: 'RegExp', phrase: 'au8_data\\[\\d+\\]', ignoreCase: true, wholeMatch: true}), colors[0]);
+        const first = h.registry.retrieveAll()[0];
+        h.cycle();
+        assert.strictEqual(h.registry.retrieveAll()[0].pattern, first.pattern);
+        assert.equal(h.registry.retrieveAll()[0].id, first.id);
+        assert.equal(h.registry.retrieveAll()[0].colour, colors[1]);
+        assert.equal(h.registry.retrieveAll()[0].pattern.locateIn(h.editor.wholeText).length, 3);
+    });
+    test('honors a changed custom palette and starts non-palette colors at its first entry', () => {
+        const h = createHarness();
+        h.choose(colors[0]);
+        Object.assign(h.config, {highlightColors: ['hotpink', 'navy', '#abcdef']});
+        for (const colour of ['hotpink', 'navy', '#abcdef', 'hotpink']) {
+            h.cycle();
+            assert.equal(h.registry.retrieveAll()[0].colour, colour);
+        }
+    });
+    test('supports a single-color palette and reports an empty cycle palette without deleting a rule', () => {
+        const h = createHarness();
+        h.choose(colors[0]);
+        Object.assign(h.config, {highlightColors: ['navy']});
+        h.cycle();
+        h.cycle();
+        assert.equal(h.registry.retrieveAll()[0].colour, 'navy');
+        Object.assign(h.config, {highlightColors: []});
+        assert.throws(() => h.cycle(), /textmarker.highlightColors/);
+        assert.equal(h.registry.retrieveAll().length, 1);
+    });
+    test('cycles a known pattern without cached locations and releases colors for new rules', () => {
+        const h = createHarness();
+        h.cycle();
+        h.editor.id = 'uncached.c';
+        h.cycle();
+        assert.equal(h.registry.retrieveAll().length, 1);
+        assert.equal(h.registry.retrieveAll()[0].colour, colors[1]);
+        h.editor.selectedText = 'au8_data[1]';
+        h.editor.selection = {start: 12, end: 23};
+        h.cycle();
+        assert.deepEqual(h.registry.retrieveAll().map(d => d.colour), [colors[1], colors[0]]);
+        h.editor.selectedText = 'au8_data[0]';
+        h.editor.selection = {start: 0, end: 11};
+        h.cycle();
+        assert.deepEqual(h.registry.retrieveAll().map(d => d.colour), [colors[2], colors[0]]);
+    });
     test('matches full array expressions and changes their color without duplication', () => {
         const h = createHarness();
         h.choose(colors[0]);

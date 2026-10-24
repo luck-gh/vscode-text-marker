@@ -61,6 +61,16 @@ exports.run = async () => {
         const command = name => vscode.commands.executeCommand(`textmarker.${name}`);
         select();
         for (const color of colors) await command(`highlight${color}`);
+        for (let i = 0; i < colors.length + 1; i++) {
+            await command('toggleHighlight');
+            await step('cycle-' + i);
+        }
+        report({stage: 'remove', language: vscode.env.language});
+        await command('unhighlight');
+        await step('removed');
+        await command('toggleHighlight');
+        await step('recreated');
+        await command('highlightSilver');
         await command('goToNextHighlight');
         assert.equal(editor.selection.start.character, 24);
         assert.equal(editor.selection.end.character, 35);
@@ -82,7 +92,7 @@ exports.run = async () => {
         await command('highlightUsingRegex');
         await until(() => fs.existsSync(path.join(root, 'regex.continue')), 'regex UI submission');
         select();
-        await command('highlightBlue');
+        await command('toggleHighlight');
         await command('goToNextHighlight');
         assert.equal(editor.selection.start.character, 12, 'Regex still matches the other array index after recoloring');
         assert.equal(editor.selection.end.character, 23);
@@ -204,11 +214,35 @@ async function main() {
     }, name);
     const release = name => fs.writeFileSync(path.join(root, `${name}.continue`), '');
     const expected = locales[locale];
-    await stage('styled');
+    await stage('cycle-0');
     await cdp.evaluate(`window.__textMarkerQuery = function query(selector, root = document) {const result = [...root.querySelectorAll(selector)];for (const element of root.querySelectorAll('*')) {if (element.shadowRoot) result.push(...query(selector, element.shadowRoot));}return result;}; true`);
     console.log('Real host assertions passed; checking rendered UI: ' + root);
     const styleExpression = `(() => [...document.querySelectorAll('.monaco-editor [class*="TextEditorDecorationType"]')].map(e => {const s=getComputedStyle(e);const r=e.getBoundingClientRect();return {className:e.className,x:r.x,y:r.y,width:r.width,height:r.height,background:s.backgroundColor,border:s.border,borderRadius:s.borderRadius};}))()`;
     const styles = {};
+    const cycleEvidence = [];
+    const palette = inheritedSettings['textmarker.highlightColors'];
+    for (let i = 0; i < palette.length + 1; i++) {
+        await stage('cycle-' + i);
+        const rgba = require('color-rgba')(palette[i % palette.length]);
+        const expectedBackground = `rgba(${rgba[0]}, ${rgba[1]}, ${rgba[2]}, 0.25)`;
+        const rendered = await until(async () => {const value = await cdp.evaluate(styleExpression);return value.some(item => item.background === expectedBackground) && value;}, 'rendered palette color ' + i);
+        cycleEvidence.push({color: palette[i % palette.length], rendered});
+        if (i === palette.length) await cdp.screenshot(path.join(root, '00-cycled.png'));
+        release('cycle-' + i);
+    }
+    fs.writeFileSync(path.join(root, 'cycle-evidence.json'), JSON.stringify(cycleEvidence, null, 2));
+    await stage('remove');
+    const removeText = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'l10n/bundle.l10n.json' : `l10n/bundle.l10n.${locale}.json`)))['Select a highlight to remove'];
+    await until(async () => cdp.evaluate(`document.querySelector('.quick-input-widget input')?.getAttribute('placeholder') === ${JSON.stringify(removeText)}`), 'localized removal picker');
+    await cdp.screenshot(path.join(root, '00-remove-picker.png'));
+    await cdp.key('Enter', 'Enter', 13);
+    await stage('removed');
+    await until(async () => (await cdp.evaluate(styleExpression)).length === 0, 'all decorations removed by independent unhighlight');
+    release('removed');
+    await stage('recreated');
+    await until(async () => (await cdp.evaluate(styleExpression)).some(item => item.background === 'rgba(0, 188, 212, 0.25)'), 'new highlight reuses released cyan');
+    release('recreated');
+    await stage('styled');
     styles.styled = await until(async () => {const value = await cdp.evaluate(styleExpression);return value.some(item => item.background === 'rgba(176, 190, 197, 0.25)') && value;}, 'rendered silver highlight');
     await cdp.screenshot(path.join(root, '01-highlight.png'));
     await cdp.call('Page.bringToFront');
@@ -220,6 +254,7 @@ async function main() {
     const expectedColors = manifest.contributes.menus['textmarker.highlightColours'].map(item => item.command);
     const translations = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'package.nls.json' : `package.nls.${locale}.json`)));
     const renderedLabels = await cdp.evaluate(`window.__textMarkerQuery('.context-view .action-label').map(e=>e.textContent)`);
+    assert.ok(renderedLabels.includes(translations['command.toggleHighlight']), 'Localized cycle command in context menu');
     for (const command of expectedColors) {const entry = manifest.contributes.commands.find(item=>item.command === command);assert.ok(renderedLabels.includes(translations[entry.title.slice(1,-1)]), 'Rendered color menu: ' + command);}
     const labels = await cdp.evaluate(`JSON.stringify([...window.__textMarkerQuery('.context-view .action-label')].map(e=>e.textContent))`);
     fs.writeFileSync(path.join(root, 'menu-labels.json'), labels);

@@ -51,7 +51,7 @@ Menu and setting translations live in `package.nls*.json`; runtime translations 
 Keep English, Simplified Chinese and Traditional Chinese keys in sync. Use `vscode.l10n.t` in runtime code.
 Configuration keys and command identifiers must remain language-independent.
 
-Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn --githubBranch v1.12.0` after validation. The explicit release tag keeps relative Marketplace links off the unchanged default branch.
+Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn --githubBranch v1.13.0` after validation. The explicit release tag keeps relative Marketplace links off the unchanged default branch.
 The independently branded package is `luck-gh.text-marker-custom`. Keep the `textmarker.*` configuration and command namespace stable. The original SVG icon source is `images/text-marker-custom.svg`; the Marketplace icon is its 256x256 PNG export.
 
 ## Real VS Code smoke test
@@ -61,7 +61,7 @@ using Node.js 24 or later. Supported locales are `en`, `zh-cn` and `zh-tw`.
 The script installs the VSIX into a fresh isolated profile, installs the official Chinese language pack
 when needed, and starts a real extension host with a local renderer debugging port.
 It seeds the recommended settings and a previously saved rule to verify configuration continuity under the package identity. It checks ten rendered color menu items, literal array text navigation, live border/radius/opacity
-changes including zero, localized regex and save prompts, and regex preservation after recoloring.
+changes including zero, localized regex and save prompts, regex preservation after recoloring, a full palette cycle with wraparound, and independent removal.
 Screenshots, renderer styles, menu labels and the actual saved rule remain under ignored
 `__host-smoke/`; failed runs are preserved. The test closes its own window automatically.
 Personal VS Code profiles, settings and windows are not used by this test.

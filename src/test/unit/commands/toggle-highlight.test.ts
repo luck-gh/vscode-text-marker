@@ -10,6 +10,7 @@ import StringPattern from '../../../lib/pattern/string';
 import {Decoration} from '../../../lib/entities/decoration';
 import {TextEditorDecorationType} from 'vscode';
 import {none, some} from 'fp-ts/lib/Option';
+import ConfigStore from '../../../lib/config-store';
 import {DecorationTypeRegistry} from '../../../lib/decoration/decoration-type-registry';
 
 suite('ToggleHighlightCommand', () => {
@@ -27,9 +28,10 @@ suite('ToggleHighlightCommand', () => {
     textLocationRegistry.register('EDITOR_ID', 'DECORATION_ID', [registeredRange]);
 
     const decorationRegistry = mock(DecorationRegistry);
+    when(decorationRegistry.inquireByPattern(newPattern)).thenReturn(none);
     when(decorationRegistry.issue(newPattern, any())).thenReturn(some(mockType<Decoration>({pattern: newPattern})));
     when(decorationRegistry.issue(knownPattern)).thenReturn(none);
-    when(decorationRegistry.inquireById('DECORATION_ID')).thenReturn(some(mockType<Decoration>({id: 'DECORATION_ID'})));
+    when(decorationRegistry.inquireById('DECORATION_ID')).thenReturn(some(new Decoration('DECORATION_ID', knownPattern, 'red')));
 
     const decorationTypeRegistry = mock(DecorationTypeRegistry);
     when(decorationTypeRegistry.provideFor(any())).thenReturn(decorationType);
@@ -50,15 +52,16 @@ suite('ToggleHighlightCommand', () => {
                 textLocationRegistry,
                 decorationRegistry,
                 decorationTypeRegistry,
-                mockType<WindowComponent>({visibleTextEditors: [editor]})
+                mockType<WindowComponent>({visibleTextEditors: [editor]}),
+            mockType<ConfigStore>({highlightColors: ['red', 'blue']})
             );
             command.execute(editor);
 
             verify(editor.setDecorations(decorationType, [{start: 4, end: 12}]));
         });
 
-        test('it remove decoration if the cursor is on highlight', () => {
-            const editor = mockMethods<TextEditor>(['unsetDecorations'], {
+        test('it recolors without removing the rule if the cursor is on highlight', () => {
+            const editor = mockMethods<TextEditor>(['unsetDecorations', 'setDecorations'], {
                 id: 'EDITOR_ID',
                 selectedText: 'SELECTED_KNOWN',
                 selection: registeredRange,
@@ -70,10 +73,12 @@ suite('ToggleHighlightCommand', () => {
                 textLocationRegistry,
                 decorationRegistry,
                 decorationTypeRegistry,
-                mockType<WindowComponent>({visibleTextEditors: [editor]})
+                mockType<WindowComponent>({visibleTextEditors: [editor]}),
+                mockType<ConfigStore>({highlightColors: ['red', 'blue']})
             );
             command.execute(editor);
 
+            verify(decorationRegistry.update(new Decoration('DECORATION_ID', knownPattern, 'red'), new Decoration('DECORATION_ID', knownPattern, 'blue')));
             verify(editor.unsetDecorations(decorationType));
         });
     });
@@ -91,7 +96,8 @@ suite('ToggleHighlightCommand', () => {
             textLocationRegistry,
             decorationRegistry,
             decorationTypeRegistry,
-            mockType<WindowComponent>({visibleTextEditors: [editor]})
+            mockType<WindowComponent>({visibleTextEditors: [editor]}),
+                mockType<ConfigStore>({highlightColors: ['red', 'blue']})
         );
 
         test('it does nothing', () => {

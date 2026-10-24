@@ -6,7 +6,7 @@ export const decorationTypes = '123456789'.split('').map(digit => ({key: `DECORA
 export const createFakeVsCode = ({editors}: any = {}) => {
     const commands = {} as any;
     const textMarkerConfig = {
-        highlightColors: ['COLOUR_A', 'COLOUR_B'],
+        highlightColors: ['red', 'blue'],
         savedHighlights: [] as any[]
     } as any;
     return {

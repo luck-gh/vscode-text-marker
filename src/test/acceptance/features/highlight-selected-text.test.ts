@@ -59,15 +59,15 @@ suite('Highlight command', () => {
         });
     });
 
-    test('unhighlight selected text if the exact text is already selected', async () => {
+    test('cycles color if the exact text is already selected', async () => {
         await command(editor1);
         await command(editor1);
 
         wrapVerify((c1, c2) => verify(editor1.setDecorations(c1(), c2())), {
-            call1: [decorationTypes[0], []]
+            call2: [decorationTypes[1], [new Range(new Position(0, 2), new Position(0, 6)), new Range(new Position(0, 9), new Position(0, 13))]]
         });
         wrapVerify((c1, c2) => verify(editor2.setDecorations(c1(), c2())), {
-            call1: [decorationTypes[0], []]
+            call2: [decorationTypes[1], [new Range(new Position(0, 2), new Position(0, 6))]]
         });
     });
 });
