@@ -6,9 +6,9 @@ const {spawn, spawnSync} = require('node:child_process');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const colors = ['Cyan', 'Blue', 'Yellow', 'Purple', 'Green', 'Red', 'Pink', 'Lime', 'Teal', 'Silver'];
 const locales = {
-    en: {menu: 'Highlight Color', regex: 'Enter a regular expression without enclosing / characters', save: 'Select where to save highlights'},
-    'zh-cn': {menu: '高亮颜色', regex: '输入正则表达式, 不需要两端的 /', save: '选择高亮的保存范围'},
-    'zh-tw': {menu: '醒目提示色彩', regex: '輸入規則運算式, 不需要兩端的 /', save: '選擇醒目提示的儲存範圍'}
+    en: {menu: 'Set Highlight', regex: 'Enter a regular expression without enclosing / characters', save: 'Select where to save highlights'},
+    'zh-cn': {menu: '设置高亮', regex: '输入正则表达式, 不需要两端的 /', save: '选择高亮的保存范围'},
+    'zh-tw': {menu: '設定醒目提示', regex: '輸入規則運算式, 不需要兩端的 /', save: '選擇醒目提示的儲存範圍'}
 };
 async function until(read, label, timeout = 45000) {
     const started = Date.now();
@@ -266,7 +266,7 @@ async function main() {
     const expectedColors = manifest.contributes.menus['textmarker.highlightColours'].map(item => item.command);
     const translations = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'package.nls.json' : `package.nls.${locale}.json`)));
     const renderedLabels = await cdp.evaluate(`window.__textMarkerQuery('.context-view .action-label').map(e=>e.textContent)`);
-    assert.ok(renderedLabels.includes(translations['command.toggleHighlight']), 'Localized cycle command in context menu');
+    assert.ok(!renderedLabels.includes(translations['command.toggleHighlight']), 'Cycle command stays out of the context submenu');
     for (const command of expectedColors) {const entry = manifest.contributes.commands.find(item=>item.command === command);assert.ok(renderedLabels.includes(translations[entry.title.slice(1,-1)]), 'Rendered color menu: ' + command);}
     const labels = await cdp.evaluate(`JSON.stringify([...window.__textMarkerQuery('.context-view .action-label')].map(e=>e.textContent))`);
     fs.writeFileSync(path.join(root, 'menu-labels.json'), labels);

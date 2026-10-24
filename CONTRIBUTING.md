@@ -51,7 +51,7 @@ Menu and setting translations live in `package.nls*.json`; runtime translations 
 Keep English, Simplified Chinese and Traditional Chinese keys in sync. Use `vscode.l10n.t` in runtime code.
 Configuration keys and command identifiers must remain language-independent.
 
-Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn --githubBranch v1.13.0` after validation. The explicit release tag keeps relative Marketplace links off the unchanged default branch.
+Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn --githubBranch v1.13.1` after validation. The explicit release tag keeps relative Marketplace links off the unchanged default branch.
 The independently branded package is `luck-gh.text-marker-custom`. Keep the `textmarker.*` configuration and command namespace stable. The original SVG icon source is `images/text-marker-custom.svg`; the Marketplace icon is its 256x256 PNG export.
 
 ## Real VS Code smoke test

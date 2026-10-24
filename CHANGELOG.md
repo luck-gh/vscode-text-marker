@@ -5,6 +5,12 @@ All notable changes to "Text Marker Custom" extension will be documented in this
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.13.1] - 2026-10-25
+### Changed
+
+- Combine the editor context menu's highlight-color entries into the localized **Set Highlight** submenu. Hovering opens the ten fixed color commands; Ctrl+H continues to cycle colors.
+- Keep `textmarker.commandsOnContextMenu.toggleHighlight` as the visibility setting for the submenu, and retain `textmarker.toggleHighlight` in the command palette and existing keybindings.
+
 ## [1.13.0] - 2026-10-24
 ### Changed
 

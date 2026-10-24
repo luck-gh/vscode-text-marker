@@ -2,14 +2,14 @@
   "name": "text-marker-custom",
   "displayName": "Text Marker Custom",
   "description": "%extension.description%",
-  "version": "1.13.0",
+  "version": "1.13.1",
   "publisher": "luck-gh",
   "license": "SEE LICENSE IN LICENSE.txt",
   "icon": "images/text-marker-custom.png",
   "bugs": {
     "url": "https://github.com/luck-gh/vscode-text-marker/issues"
   },
-  "homepage": "https://github.com/luck-gh/vscode-text-marker/blob/v1.13.0/README.md",
+  "homepage": "https://github.com/luck-gh/vscode-text-marker/blob/v1.13.1/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/luck-gh/vscode-text-marker.git"
@@ -352,11 +352,6 @@
     "menus": {
       "editor/context": [
         {
-          "command": "textmarker.toggleHighlight",
-          "group": "2_textmarker@1",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.toggleHighlight"
-        },
-        {
           "command": "textmarker.updateHighlight",
           "group": "2_textmarker@2",
           "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.updateHighlight"
@@ -404,7 +399,7 @@
         {
           "submenu": "textmarker.highlightColours",
           "group": "2_textmarker@0",
-          "when": "editorTextFocus"
+          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.toggleHighlight"
         }
       ],
       "textmarker.highlightColours": [
@@ -453,7 +448,7 @@
     "submenus": [
       {
         "id": "textmarker.highlightColours",
-        "label": "%menu.highlightColours%"
+        "label": "%menu.setHighlight%"
       }
     ]
   },
