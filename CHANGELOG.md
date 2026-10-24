@@ -1,9 +1,17 @@
 # Change Log
 
-All notable changes to "Text Marker (Highlighter)" extension will be documented in this file.
+All notable changes to "Text Marker Custom" extension will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+
+## [1.12.0] - 2026-10-24
+### Changed
+- Use the independent `luck-gh.text-marker-custom` identity and Text Marker Custom display name.
+- Add an original vector highlighter icon and a 256x256 PNG export.
+- Provide Chinese and English introductions with explicit language links, recommended JSONC settings and the original MIT-licensed demonstrations.
+- Retain the upstream attribution, MIT notice and existing `textmarker.*` settings and commands.
+- Require the original Text Marker edition to be disabled or uninstalled to avoid command conflicts.
 
 ## [1.11.1] - 2026-10-24 (custom fork)
 ### Added

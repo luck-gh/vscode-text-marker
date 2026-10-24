@@ -47,6 +47,16 @@ exports.run = async () => {
         for (const color of colors) assert.ok(commands.includes(`textmarker.highlight${color}`));
         const document = await vscode.workspace.openTextDocument(path.join(root, 'sample.txt'));
         const editor = await vscode.window.showTextDocument(document);
+        const inheritedSettings = JSON.parse(fs.readFileSync(path.join(root, 'recommended-settings.json')));
+        for (const [key, value] of Object.entries(inheritedSettings)) {
+            assert.deepEqual(vscode.workspace.getConfiguration().get(key), value, 'Existing configuration: ' + key);
+        }
+        editor.selection = new vscode.Selection(1, 0, 1, 13);
+        await vscode.commands.executeCommand('textmarker.goToNextHighlight');
+        assert.equal(editor.selection.start.line, 1);
+        assert.equal(editor.selection.start.character, 14, 'Restore an existing textmarker.savedHighlights rule under the new extension identity');
+        assert.equal(editor.selection.end.character, 27);
+        await vscode.commands.executeCommand('textmarker.clearAllHighlight');
         const select = () => {editor.selection = new vscode.Selection(0, 0, 0, 11);};
         const command = name => vscode.commands.executeCommand(`textmarker.${name}`);
         select();
@@ -86,7 +96,7 @@ exports.run = async () => {
         assert.deepEqual(saved[0], {pattern: {type: 'regex', expression: 'au8_data\\[\\d+\\]', ignoreCase: false, wholeMatch: false}, color: '#5C8DFF'});
         await step('saved');
         await command('clearAllHighlight');
-        report({stage: 'complete', language: vscode.env.language, extension: extension.id, version: extension.packageJSON.version, extensionPath: extension.extensionPath, saved});
+        report({stage: 'complete', language: vscode.env.language, extension: extension.id, version: extension.packageJSON.version, extensionPath: extension.extensionPath, configurationContinuity: true, saved});
     } catch (error) {
         report({stage: 'failed', message: error.stack});
         throw error;
@@ -131,17 +141,23 @@ async function main() {
     assert.ok(vsix && codeExe, 'Usage: node scripts/host-smoke.cjs package.vsix path/to/Code.exe [en|zh-cn|zh-tw]');
     assert.ok(locales[locale], `Unsupported test locale: ${locale}`);
     const manifest = require(path.resolve(__dirname, '..', 'package.json'));
+    const json5 = require('json5');
+    const readme = fs.readFileSync(path.resolve(__dirname, '..', 'README.md'), 'utf8').replace(/\r\n/g, '\n');
+    const recommended = json5.parse(readme.match(/```jsonc\n([\s\S]*?)\n```/)[1]);
+    const inheritedSettings = {...recommended, 'textmarker.savedHighlights': [{
+        pattern: {type: 'string', expression: 'legacy_marker', ignoreCase: false, wholeMatch: true}, color: '#C0FFEE'
+    }]};
     const root = path.resolve(__dirname, '..', '__host-smoke', new Date().toISOString().replace(/[:.]/g, '-') + '-' + locale);
     assert.ok(!fs.existsSync(root), `Evidence already exists: ${root}. Preserve it and use a fresh test directory.`);
     fs.mkdirSync(path.join(root, 'user', 'User'), {recursive: true});
     const extensions = path.join(root, 'extensions');
     fs.mkdirSync(extensions);
     fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
-    fs.writeFileSync(path.join(root, 'sample.txt'), 'au8_data[0] au8_data[1] au8_data[0] au8_data[0\n');
+    fs.writeFileSync(path.join(root, 'sample.txt'), 'au8_data[0] au8_data[1] au8_data[0] au8_data[0\nlegacy_marker legacy_marker\n');
+    fs.writeFileSync(path.join(root, 'recommended-settings.json'), JSON.stringify(inheritedSettings));
     fs.writeFileSync(path.join(root, 'user', 'User', 'settings.json'), JSON.stringify({
         'telemetry.telemetryLevel': 'off',
-        'textmarker.borderWidth': 1, 'textmarker.borderStyle': 'solid', 'textmarker.borderRadius': 999,
-        'textmarker.defaultHighlightOpacity': 0.7, 'workbench.startupEditor': 'none',
+        ...inheritedSettings, 'workbench.startupEditor': 'none',
         'window.restoreWindows': 'none', 'update.mode': 'none', 'extensions.autoCheckUpdates': false,
         'extensions.autoUpdate': false, 'window.menuStyle': 'custom', 'editor.minimap.enabled': false, 'editor.fontSize': 22
     }));
@@ -193,7 +209,7 @@ async function main() {
     console.log('Real host assertions passed; checking rendered UI: ' + root);
     const styleExpression = `(() => [...document.querySelectorAll('.monaco-editor [class*="TextEditorDecorationType"]')].map(e => {const s=getComputedStyle(e);const r=e.getBoundingClientRect();return {className:e.className,x:r.x,y:r.y,width:r.width,height:r.height,background:s.backgroundColor,border:s.border,borderRadius:s.borderRadius};}))()`;
     const styles = {};
-    styles.styled = await until(async () => {const value = await cdp.evaluate(styleExpression);return value.some(item => item.background === 'rgba(176, 190, 197, 0.7)') && value;}, 'rendered silver highlight');
+    styles.styled = await until(async () => {const value = await cdp.evaluate(styleExpression);return value.some(item => item.background === 'rgba(176, 190, 197, 0.25)') && value;}, 'rendered silver highlight');
     await cdp.screenshot(path.join(root, '01-highlight.png'));
     await cdp.call('Page.bringToFront');
     release('styled');

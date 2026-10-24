@@ -1,15 +1,15 @@
 {
-  "name": "text-marker",
-  "displayName": "Text Marker (Highlighter)",
+  "name": "text-marker-custom",
+  "displayName": "Text Marker Custom",
   "description": "%extension.description%",
-  "version": "1.11.1",
-  "publisher": "ryu1kn",
+  "version": "1.12.0",
+  "publisher": "luck-gh",
   "license": "SEE LICENSE IN LICENSE.txt",
-  "icon": "images/text-marker.png",
+  "icon": "images/text-marker-custom.png",
   "bugs": {
     "url": "https://github.com/luck-gh/vscode-text-marker/issues"
   },
-  "homepage": "https://github.com/luck-gh/vscode-text-marker#readme",
+  "homepage": "https://github.com/luck-gh/vscode-text-marker/blob/v1.12.0/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/luck-gh/vscode-text-marker.git"

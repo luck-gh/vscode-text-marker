@@ -1,5 +1,5 @@
 {
-  "extension.description": "Select text and highlight all matches with configurable colors.",
+  "extension.description": "Custom Text Marker with ten colors, live styles and English/Chinese UI. Based on ryu1kn/vscode-text-marker.",
   "configuration.title": "Text Marker settings",
   "command.highlightUsingRegex": "Highlight Using Regular Expression",
   "command.toggleHighlight": "Toggle Highlight",

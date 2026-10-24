@@ -1,237 +1,127 @@
-# Text Marker (Highlighter)
+# Text Marker Custom
 
-## Fork additions
+简体中文 | [English](https://github.com/luck-gh/vscode-text-marker/blob/v1.12.0/README.en.md)
 
-Based on [ryu1kn/vscode-text-marker](https://github.com/ryu1kn/vscode-text-marker), under the original MIT license.
+![Text Marker Custom](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.12.0/images/text-marker-custom.png)
 
-This fork adds English, Simplified Chinese and Traditional Chinese UI localization,
-a ten-color context submenu, configurable highlight borders and corner radius,
-and live style refresh. Select a color to add a highlight or recolor an existing one;
-recoloring preserves regular expressions and matching options.
+十色文本高亮, 可调边框和圆角, 支持英文与简繁中文界面. 选中 `au8_data[0]` 等文本即可高亮完整匹配项, 也可以使用正则表达式.
 
-- `textmarker.borderWidth`: border width in pixels, `0` disables the border.
-- `textmarker.borderStyle`: `solid`, `dashed`, `dotted`, `double` or `none`.
-- `textmarker.borderRadius`: corner radius in pixels, `0` is square and `999` is pill-shaped.
-- `textmarker.defaultHighlightOpacity`: existing background opacity setting, from `0` to `1`.
+本扩展由 `luck-gh` 发布, ID 为 `luck-gh.text-marker-custom`. 基于 [Ryuichi Inagaki 的 Text Marker](https://github.com/ryu1kn/vscode-text-marker), 保留原 MIT 署名. 使用独立名称和原创高亮笔图标. 本 Fork 已移除扩展使用遥测及相关依赖.
 
-The context submenu contains ten fixed color presets. Automatic color allocation still
-uses `textmarker.highlightColors`. User keybindings and personal colors remain in VS Code settings.
-Language follows VS Code's display language after restart; unsupported languages use English.
-Requires VS Code 1.73 or later. See [CONTRIBUTING.md](CONTRIBUTING.md) for building and testing.
-GitHub custom VSIX builds retain the original `ryu1kn.text-marker` extension ID and replace
-an installed Text Marker. This is a custom build from the luck-gh fork, not an upstream release.
-Only one Text Marker build should be enabled. Existing `textmarker.*` settings, saved rules
-and custom keybindings continue to use the same identifiers; installation does not rewrite them.
-An independently published Marketplace edition requires a separate, verified publisher identity.
+介绍页通过上方链接手动切换中英文. 插件的菜单, 设置说明和运行时提示会在重启后自动跟随 VS Code 显示语言, 支持英文, 简体中文和繁体中文; 其他语言使用英文.
 
-This fork does not collect extension usage telemetry. The upstream telemetry integration and
-its dependency have been removed.
+## 安装与原版迁移
 
+需要 VS Code 1.73 或更高版本. 可从 [GitHub Release](https://github.com/luck-gh/vscode-text-marker/releases/tag/v1.12.0) 下载 VSIX, 执行 `Extensions: Install from VSIX...` 安装. Marketplace 发布后也可按 ID `luck-gh.text-marker-custom` 查找安装.
 
-## Features
+切换前先禁用或卸载原版 `ryu1kn.text-marker`. 两个版本沿用同一套 `textmarker.*` 命令和设置, 不能同时启用. 已保存的高亮规则, 个人调色板和自定义快捷键继续使用原标识符. 安装不会重写用户配置; 旧版仍在运行的窗口需要执行 `Developer: Reload Window`.
 
-* Highlight/Unhighlight text from both command palette or right-click menu
-* Update existing highlight rules from the right-click menu
-* Jump to the next/previous location of the same highlighted pattern
-* Highlight text using a regular expression
-* Case sensitive/insensitive text matching
-  * Matching is done depending on the current mode for case sensitivity. You can toggle the mode from the status bar.
-* Whole/Partial text matching
-  * Matching is done depending on the current mode for whole match. You can toggle the mode from the status bar.
-* Highlighting colour is configurable
-* Save highlights that will be restored next time you open the editor
+## 使用方式
 
-Highlight/Unhighlight text. Regular expression can also be used. It highlights your text as you type.
+- 选中文本, 在右键的高亮颜色子菜单中选择十种颜色之一.
+- 在已有高亮上重新选色可直接换色, 保留原正则表达式和大小写, 整词匹配选项.
+- 修改边框, 圆角或透明度后, 已有高亮立即刷新.
+- 使用命令面板中的正则高亮, 编辑高亮规则, 清除全部高亮, 保存全部高亮等命令.
+- 状态栏可切换大小写与整词匹配模式. 下一个或上一个相同高亮命令可通过命令面板调用.
 
-![Highlight and unhighlight text](https://raw.githubusercontent.com/ryu1kn/vscode-text-marker/master/images/animations/public.gif)
+| 设置 | 含义 |
+| --- | --- |
+| `textmarker.borderWidth` | 边框宽度, 单位 px; `0` 关闭边框. |
+| `textmarker.borderStyle` | `solid`, `dashed`, `dotted`, `double` 或 `none`. |
+| `textmarker.borderRadius` | 圆角半径, 单位 px; `0` 为直角, `999` 为胶囊形. |
+| `textmarker.defaultHighlightOpacity` | 背景透明度, 范围 `0` 到 `1`. |
+| `textmarker.highlightColors` | 自动分配高亮使用的调色板. 右键十色菜单为固定预设. |
+| `textmarker.autoSelectDistinctiveTextColor` | `false` 保留语法高亮文字颜色. |
 
-Switch matching mode. Case sensitive match, Whole match are available. From command palette, you can even change the matching mode after you specified a highlight.
+## 推荐配置
 
-![Ignore Case and Whole Match](https://raw.githubusercontent.com/ryu1kn/vscode-text-marker/master/images/animations/ignore-case-and-whole-match.gif)
+这套配置采用日常使用的十色调色板, 25% 背景透明度和胶囊形边框. 自动文字对比沿用默认关闭行为, 在推荐块中显式设为 `false`, 以保留原有语法字色.
 
-You can update a highlight rule after you set it.
+把下面的配置项合并到用户 `settings.json` 中. 这是 JSONC, 行注释可直接保留.
 
-![Update Existing Highlight](https://raw.githubusercontent.com/ryu1kn/vscode-text-marker/master/images/animations/update-highlight.gif)
+```jsonc
+{
+    // 区分大小写, 按部分文本匹配.
+    "textmarker.enableIgnoreCase": false,
+    "textmarker.enableWholeMatch": false,
 
-## Request Features or Report Bugs
+    // 自动分配高亮时使用的十色调色板, 与右键颜色菜单一致.
+    "textmarker.highlightColors": [
+        "#00BCD4", // 青色
+        "#5C8DFF", // 蓝色
+        "#FFEB3B", // 黄色
+        "#AB47BC", // 紫色
+        "#4CAF50", // 绿色
+        "#FF5252", // 红色
+        "#FF80AB", // 粉色
+        "#CDDC39", // 黄绿色
+        "#26A69A", // 蓝绿色
+        "#B0BEC5"  // 银灰色
+    ],
 
-Feature requests and bug reports are very welcome: https://github.com/luck-gh/vscode-text-marker/issues
+    // 背景透明度为 25%, 保留原有语法高亮文字颜色.
+    "textmarker.defaultHighlightOpacity": 0.25,
+    "textmarker.autoSelectDistinctiveTextColor": false,
 
-A couple of requests from me when you raise an github issue.
+    // 同色 1px 实线边框, 999px 圆角呈胶囊形.
+    "textmarker.borderWidth": 1,
+    "textmarker.borderStyle": "solid",
+    "textmarker.borderRadius": 999,
 
-* **Requesting a feature:** Please try to provide the context of why you want the feature. Such as,
-  in what situation the feature could help you and how, or how the lack of the feature is causing an inconvenience to you.
-  I can't think of introducing it until I understand how it helps you 🙂
-* **Reporting a bug:** Please include environment information (OS name/version, the editor version).
-  Also consider providing screenshots (or even videos) where appropriate. They are often very very helpful!
-
-## Commands
-
-* `Toggle Highlight` (**Command ID**: `textmarker.toggleHighlight`)
-
-    Highlight selected text, if no text is selected, the word under cursor will be highlighted.
-    Issueing this command on a highlight without selecting any text will remove the highlight.
-    Available on right-click menu.
-
-* `Update Highlight` (**Command ID**: `textmarker.updateHighlight`)
-
-    Update the existing highlight (Toggle case sensitivity, whole/partial match, pattern text).
-    Available on right-click menu.
-
-* `Go to Next Same Highlight` (**Command ID**: `textmarker.goToNextHighlight`)
-
-    Move the cursor to the next location of the same highlight. Highlight selection or the word under cursor
-    first if the cursor is not on a highlight.
-    Available on right-click menu.
-
-* `Go to Previous Same Highlight` (**Command ID**: `textmarker.goToPreviousHighlight`)
-
-    Move the cursor to the previous location of the same highlight. Highlight selection or the word under cursor
-    first if the cursor is not on a highlight.
-    Available on right-click menu.
-
-* `Highlight Text Using Regex` (**Command ID**: `textmarker.highlightUsingRegex`)
-
-    Highlight text that matches a given regular expression.
-
-* `Unhighlight Text` (**Command ID**: `textmarker.unhighlight`)
-
-    Remove a highlight from the list of highlights.
-
-* `Clear All Highlights` (**Command ID**: `textmarker.clearAllHighlight`)
-
-    Clear all highlights with one shot.
-
-* `Save All Highlights` (**Command ID**: `textmarker.saveAllHighlights`)
-
-    Save all highlights that will be restored when opening an editor.
-
-* `Toggle Case Sensitivity` (**Command ID**: `textmarker.toggleCaseSensitivity`)
-
-    Toggle the case sensitivity of a highlight.
-
-* `Toggle Mode for Case Sensitivity` (**Command ID**: `textmarker.toggleModeForCaseSensitivity`)
-
-    Toggle mode for case sensitivity.
-    Available on Status bar.
-
-* `Toggle Whole/Partial Match` (**Command ID**: `textmarker.toggleWholeMatch`)
-
-    Toggle whole match and partial match.
-
-* `Toggle Mode for Whole/Partial Match` (**Command ID**: `textmarker.toggleModeForWholeMatch`)
-
-    Toggle mode for whole match and partial match.
-    Available on Status bar.
-
-## Extension Settings
-
-* `textmarker.highlightColors`
-
-    List of colours to be used to highlight the selected text. The colours are used with respect to the order in the list.
-    If it runs out of the colours, it uses the colour specified at `textmarker.defaultHighlightColor`.
-
-* `textmarker.defaultHighlightColor` (default: `"gray"`)
-
-    Once all the colours given in `textmarker.highlightColors` is used, texts are highlighted with this colour.
-
-* `textmarker.defaultHighlightOpacity` (default: `0.7`)
-
-    Opacity to be used when one is not given in the highlight colour. Opacity is also applied to the colours on the overview ruler.
-    The value must be in the range 0.0 to 1.0, inclusive.
-
-* `textmarker.enableIgnoreCase` (default: `false`)
-
-    Enable ignore case mode on startup
-
-* `textmarker.enableWholeMatch` (default: `false`)
-
-    Enable whole match mode on startup
-
-* `textmarker.useHighlightColorOnRuler` (default: `true`)
-
-    Use the same colour for both highlighting a text and showing the location on the ruler.
-
-    If you have multiple highlights on the same line and their colours have opacity `1`,
-    you would only see one of those colours. You can specify a smaller opacity value so that the colours can be blended.
-
-* `textmarker.autoSelectDistinctiveTextColor` (default: `false`)
-
-    Text colour will be chosen to be distinctive from the background highlight colour.
-    This will hide the text colour given by syntax highlighting; if this is not desirable, set it `false`.
-
-* `textmarker.hideStatusBarItems` (default: `false`)
-
-    Hide status bar items. When set it `true`, the buttons to switch the modes of partial/whole match and
-    case sensitive/insensitive match will not be displayed.
-
-* `textmarker.delayForRefreshingHighlight` (default: `300`)
-
-    Number of milliseconds to wait before refreshing the highlights on editor contents change. `null` for no refresh.
-
-* `textmarker.commandsOnContextMenu` (default: 4 commands are visible. See them [here](https://github.com/ryu1kn/vscode-text-marker/blob/c8fcadd3b9271b46c7de1b15c776e6d4889aa35e/package.json#L109))
-
-    Commands appear on the context menu. For historical reason, 4 commands are visible by default.
-
-    For example, if you:
-
-    * Do NOT want to see **Update Highlight** command (Command ID: `textmarker.updateHighlight`), which is on the menu by default
-    * Want to see **Clear All Highlights** (Command ID: `textmarker.clearAllHighlight`), which is NOT on the menu by default
-
-    You can set this setting like this:
-
-    ```
+    // 精简其他右键命令. 十色子菜单始终可用, 不受此对象控制.
     "textmarker.commandsOnContextMenu": {
-      "updateHighlight": false,
-      "clearAllHighlight": true
+        "toggleHighlight": true,
+        "unhighlight": true,
+        "clearAllHighlight": true,
+        "updateHighlight": true,
+        "goToNextHighlight": false,
+        "goToPreviousHighlight": false,
+        "highlightUsingRegex": true,
+        "toggleCaseSensitivity": false,
+        "toggleWholeMatch": false,
+        "saveAllHighlights": false
     }
-    ```
-
-* `textmarker.savedHighlights`
-
-    List of highlights that will get applied when opening editor.
-    This value is typically set/updated by "**Save All Highlights**" command.
-
-    Different levels of settings (user settings, workspace settings) are not merged; so the most specific settings wins.
-
-    Sample `savedHighlights`:
-
-    ```
-    "textmarker.savedHighlights": [
-      {
-        "pattern": {
-          "type": "regex",
-          "expression": "(TODO|XXX|HACK): .*",
-          "ignoreCase": false,
-          "wholeMatch": true
-        },
-        "color": "skyblue"
-      },
-      {
-        "pattern": {
-          "type": "string",
-          "expression": "NOTE",
-          "ignoreCase": false,
-          "wholeMatch": false
-        },
-        "color": "yellow"
-      },
-      ...
-    ]
-    ```
-
-## Keyboard Shortcuts
-
-You can quickly invoke the above TextMarker commands by registering them to your keyboard shortcut settings. For example:
-
-```json
-  { "key": "ctrl+h", "command": "textmarker.toggleHighlight", "when": "editorTextFocus" }
+}
 ```
 
-## Changelog
+将下面两项合并到用户 `keybindings.json` 的数组中. `Ctrl+H` 在编辑器内会覆盖默认的查找替换快捷键.
 
-* [CHANGELOG.md](CHANGELOG.md)
+```jsonc
+[
+    {
+        // 编辑器内用 Ctrl+H 切换高亮, 覆盖默认的查找替换快捷键.
+        "key": "ctrl+h",
+        "command": "textmarker.toggleHighlight",
+        "when": "editorTextFocus"
+    },
+    {
+        // 编辑器内用 Ctrl+Alt+H 取消高亮.
+        "key": "ctrl+alt+h",
+        "command": "textmarker.unhighlight",
+        "when": "editorTextFocus"
+    }
+]
+```
 
-## How to contribute
+## 原作者演示
 
-Thank you for considering a contribution. Please check [CONTRIBUTING.md](./CONTRIBUTING.md).
+以下三张动图沿用 [原项目](https://github.com/ryu1kn/vscode-text-marker) 的 MIT 资源, 展示基础高亮, 匹配模式和规则编辑. 新增十色菜单与样式配置见上文.
+
+高亮与取消高亮:
+
+![原作者演示: 高亮与取消高亮](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.12.0/images/animations/public.gif)
+
+大小写与整词匹配:
+
+![原作者演示: 匹配模式](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.12.0/images/animations/ignore-case-and-whole-match.gif)
+
+编辑已有规则:
+
+![原作者演示: 编辑高亮规则](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.12.0/images/animations/update-highlight.gif)
+
+## 开发, 反馈与许可
+
+- [提交问题](https://github.com/luck-gh/vscode-text-marker/issues).
+- [构建与测试说明](https://github.com/luck-gh/vscode-text-marker/blob/v1.12.0/CONTRIBUTING.md), 包含编译, 模拟测试和隔离的三语真实宿主验收.
+- [更新记录](https://github.com/luck-gh/vscode-text-marker/blob/v1.12.0/CHANGELOG.md).
+- [MIT 许可证](https://github.com/luck-gh/vscode-text-marker/blob/v1.12.0/LICENSE.txt), 保留 `Copyright (c) 2016 Ryuichi Inagaki`.

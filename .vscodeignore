@@ -27,3 +27,5 @@ tsconfig.json
 yarn-error.log
 CONTRIBUTING.md
 scripts/**
+images/text-marker.png
+images/text-marker-custom.svg

@@ -1,5 +1,5 @@
 {
-  "extension.description": "選取文字並醒目提示所有相符內容, 支援自訂色彩.",
+  "extension.description": "Text Marker 自訂版, 支援十色醒目提示, 即時樣式及中英文介面. 基於 ryu1kn/vscode-text-marker.",
   "configuration.title": "Text Marker 醒目提示設定",
   "command.highlightUsingRegex": "使用規則運算式醒目提示",
   "command.toggleHighlight": "切換醒目提示",

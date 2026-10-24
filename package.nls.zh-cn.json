@@ -1,5 +1,5 @@
 {
-  "extension.description": "选中文本并高亮所有匹配内容, 支持自定义颜色.",
+  "extension.description": "Text Marker 定制版, 支持十色高亮, 实时样式和中英文界面. 基于 ryu1kn/vscode-text-marker.",
   "configuration.title": "Text Marker 高亮设置",
   "command.highlightUsingRegex": "使用正则表达式高亮",
   "command.toggleHighlight": "切换高亮",
