@@ -1,7 +1,26 @@
-[![Build Status](https://travis-ci.org/ryu1kn/vscode-text-marker.svg?branch=master)](https://travis-ci.org/ryu1kn/vscode-text-marker)
-[![Code Climate](https://codeclimate.com/github/ryu1kn/vscode-text-marker/badges/gpa.svg)](https://codeclimate.com/github/ryu1kn/vscode-text-marker)
-
 # Text Marker (Highlighter)
+
+## Fork additions
+
+Based on [ryu1kn/vscode-text-marker](https://github.com/ryu1kn/vscode-text-marker), under the original MIT license.
+
+This fork adds English, Simplified Chinese and Traditional Chinese UI localization,
+a ten-color context submenu, configurable highlight borders and corner radius,
+and live style refresh. Select a color to add a highlight or recolor an existing one;
+recoloring preserves regular expressions and matching options.
+
+- `textmarker.borderWidth`: border width in pixels, `0` disables the border.
+- `textmarker.borderStyle`: `solid`, `dashed`, `dotted`, `double` or `none`.
+- `textmarker.borderRadius`: corner radius in pixels, `0` is square and `999` is pill-shaped.
+- `textmarker.defaultHighlightOpacity`: existing background opacity setting, from `0` to `1`.
+
+The context submenu contains ten fixed color presets. Automatic color allocation still
+uses `textmarker.highlightColors`. User keybindings and personal colors remain in VS Code settings.
+Language follows VS Code's display language after restart; unsupported languages use English.
+Requires VS Code 1.73 or later. See [CONTRIBUTING.md](CONTRIBUTING.md) for building and testing.
+Local builds retain the original extension ID and replace an installed Text Marker.
+Use a separate publisher identity before publishing this fork as a new Marketplace extension.
+
 
 ## Features
 
