@@ -98,7 +98,7 @@ Merge these two entries into the array in user `keybindings.json`. In the editor
 ]
 ```
 
-An existing color outside the current palette starts at its first entry on the next cycle. A one-color palette keeps that color. An empty palette cannot cycle and reports an error; new highlights use `textmarker.defaultHighlightColor` when no palette color is available. Invalid CSS colors report a configuration error. Cycling may share a color with another rule; new allocation still prefers unused colors.
+An existing color outside the current palette starts at its first entry on the next cycle. A one-color palette keeps that color. An empty palette cannot cycle and shows an error notification without changing the rule; new highlights use `textmarker.defaultHighlightColor` when no palette color is available. Cycling may share a color with another rule; new allocation still prefers unused colors.
 
 ## Original demonstrations
 

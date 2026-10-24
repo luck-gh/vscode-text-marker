@@ -65,6 +65,12 @@ exports.run = async () => {
             await command('toggleHighlight');
             await step('cycle-' + i);
         }
+        const palette = inheritedSettings['textmarker.highlightColors'];
+        const settings = vscode.workspace.getConfiguration('textmarker');
+        await settings.update('highlightColors', [], vscode.ConfigurationTarget.Global);
+        await command('toggleHighlight');
+        await step('empty-palette');
+        await settings.update('highlightColors', palette, vscode.ConfigurationTarget.Global);
         report({stage: 'remove', language: vscode.env.language});
         await command('unhighlight');
         await step('removed');
@@ -78,7 +84,6 @@ exports.run = async () => {
         await step('styled');
         await vscode.commands.executeCommand('editor.action.showContextMenu');
         await step('menu');
-        const settings = vscode.workspace.getConfiguration('textmarker');
         for (const [key, value] of Object.entries({borderWidth: 0, borderRadius: 0, defaultHighlightOpacity: 0})) {
             await settings.update(key, value, vscode.ConfigurationTarget.Global);
         }
@@ -231,6 +236,13 @@ async function main() {
         release('cycle-' + i);
     }
     fs.writeFileSync(path.join(root, 'cycle-evidence.json'), JSON.stringify(cycleEvidence, null, 2));
+    await stage('empty-palette');
+    const runtimeTranslations = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'l10n/bundle.l10n.json' : `l10n/bundle.l10n.${locale}.json`)));
+    const emptyPaletteText = runtimeTranslations['Add at least one color to textmarker.highlightColors before cycling highlight colors.'];
+    await until(async () => cdp.evaluate(`window.__textMarkerQuery('.notification-list-item-message').some(e => e.textContent === ${JSON.stringify(emptyPaletteText)})`), 'visible localized empty palette error');
+    assert.ok((await cdp.evaluate(styleExpression)).some(item => item.background === 'rgba(0, 188, 212, 0.25)'), 'Original highlight remains after empty palette error');
+    await cdp.screenshot(path.join(root, '00-empty-palette-error.png'));
+    release('empty-palette');
     await stage('remove');
     const removeText = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'l10n/bundle.l10n.json' : `l10n/bundle.l10n.${locale}.json`)))['Select a highlight to remove'];
     await until(async () => cdp.evaluate(`document.querySelector('.quick-input-widget input')?.getAttribute('placeholder') === ${JSON.stringify(removeText)}`), 'localized removal picker');

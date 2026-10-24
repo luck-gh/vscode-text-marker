@@ -24,6 +24,5 @@
   "Match case": "Match case",
   "Match whole words": "Match whole words",
   "Partial matching": "Partial matching",
-  "Add at least one color to textmarker.highlightColors before cycling highlight colors.": "Add at least one color to textmarker.highlightColors before cycling highlight colors.",
-  "textmarker.highlightColors must contain valid CSS colors.": "textmarker.highlightColors must contain valid CSS colors."
+  "Add at least one color to textmarker.highlightColors before cycling highlight colors.": "Add at least one color to textmarker.highlightColors before cycling highlight colors."
 }

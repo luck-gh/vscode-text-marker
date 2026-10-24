@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import {setTestLanguage} from '../stub-vscode';
 import {EventEmitter} from 'events';
 import * as O from 'fp-ts/lib/Option';
 import ConfigStore from '../../lib/config-store';
@@ -42,9 +43,11 @@ function createHarness() {
     const operator = new DecorationOperator([editor], registry, new TextDecorator(locations, types));
     const factory = mockType<DecorationOperatorFactory>({createForVisibleEditors: () => operator});
     const choose = (color: string) => new SetHighlightColourCommand(color, modes, locations, registry, factory).execute(editor as TextEditor);
+    const errors: string[] = [];
     const cycle = () => new ToggleHighlightCommand(modes, locations, registry, types,
-        mockType<WindowComponent>({visibleTextEditors: [editor]}), config).execute(editor);
-    return {cycle, config, patterns, registry, locations, types, editor, rendered, operator, choose, getDisposed: () => disposed};
+        mockType<WindowComponent>({visibleTextEditors: [editor],
+            showErrorMessage: (message: string) => () => {errors.push(message);return Promise.resolve('');}}), config).execute(editor);
+    return {errors, cycle, config, patterns, registry, locations, types, editor, rendered, operator, choose, getDisposed: () => disposed};
 }
 
 suite('Custom highlight controls', () => {
@@ -88,8 +91,17 @@ suite('Custom highlight controls', () => {
         h.cycle();
         h.cycle();
         assert.equal(h.registry.retrieveAll()[0].colour, 'navy');
+        const existing = h.registry.retrieveAll()[0];
         Object.assign(h.config, {highlightColors: []});
-        assert.throws(() => h.cycle(), /textmarker.highlightColors/);
+        const key = 'Add at least one color to textmarker.highlightColors before cycling highlight colors.';
+        for (const locale of ['en', 'zh-cn', 'zh-tw']) {
+            setTestLanguage(locale);
+            h.cycle();
+            const expected = locale === 'en' ? key : require(`../../../l10n/bundle.l10n.${locale}.json`)[key];
+            assert.equal(h.errors[h.errors.length - 1], expected);
+            assert.strictEqual(h.registry.retrieveAll()[0], existing);
+        }
+        setTestLanguage('en');
         assert.equal(h.registry.retrieveAll().length, 1);
     });
     test('cycles a known pattern without cached locations and releases colors for new rules', () => {

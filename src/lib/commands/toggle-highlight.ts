@@ -22,7 +22,7 @@ export default class ToggleHighlightCommand implements CommandLike {
                 textLocationRegistry: TextLocationRegistry,
                 private readonly decorationRegistry: DecorationRegistry,
                 decorationTypeRegistry: DecorationTypeRegistry,
-                windowComponent: WindowComponent,
+                private readonly windowComponent: WindowComponent,
                 private readonly configStore: ConfigStore) {
         this.decorationOperatorFactory = new DecorationOperatorFactory(decorationRegistry, decorationTypeRegistry, textLocationRegistry, windowComponent);
         this.patternFactory = new PatternFactory(matchingModeRegistry);
@@ -41,7 +41,10 @@ export default class ToggleHighlightCommand implements CommandLike {
 
     private cycleColour(decoration: Decoration) {
         const colours = this.configStore.highlightColors;
-        if (!colours.length) throw new Error(l10n.t('Add at least one color to textmarker.highlightColors before cycling highlight colors.'));
+        if (!colours.length) {
+            this.windowComponent.showErrorMessage(l10n.t('Add at least one color to textmarker.highlightColors before cycling highlight colors.'))();
+            return;
+        }
         // 不在当前色板中的颜色从第一色开始; 换色允许与其他规则共享颜色.
         const next = colours[(colours.indexOf(decoration.colour) + 1) % colours.length];
         this.decorationOperatorFactory.createForVisibleEditors().updateDecoration(decoration, decoration.withColour(next));

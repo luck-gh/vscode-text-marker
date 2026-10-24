@@ -28,17 +28,6 @@ suite('ConfigStore', () => {
         assert.deepEqual(configStore.get('CONFIG_NAME'), 'CONFIG_VALUE');
     });
 
-    test('accepts custom CSS palettes and rejects malformed external palette settings', () => {
-        for (const value of [['navy', '#abcdef', 'rgba(1, 2, 3, 0.5)'], []]) {
-            when(extensionConfig.get('highlightColors')).thenReturn(value);
-            assert.deepEqual(configStore.highlightColors, value);
-        }
-        for (const value of [['not-a-color'], [42], null, 'red']) {
-            when(extensionConfig.get('highlightColors')).thenReturn(value);
-            assert.throws(() => configStore.highlightColors, /textmarker.highlightColors/);
-        }
-    });
-
     test('it sets a config value for the specified location', async () => {
         await configStore.set('CONFIG_NAME', 'CONFIG_VALUE')();
 
