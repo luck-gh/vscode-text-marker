@@ -30,6 +30,14 @@ exports.run = async () => {
         await until(() => fs.existsSync(path.join(root, `${name}.continue`)), name);
     };
     try {
+        if (process.env.TEXT_MARKER_SMOKE_BOOTSTRAP === '1') {
+            await until(() => {
+                const cache = path.join(root, 'user', 'languagepacks.json');
+                return fs.existsSync(cache) && JSON.parse(fs.readFileSync(cache))[process.env.TEXT_MARKER_SMOKE_LOCALE];
+            }, 'official language pack cache from initial workbench scan');
+            report({stage: 'bootstrapped', language: vscode.env.language});
+            return;
+        }
         const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json')));
         const extension = vscode.extensions.getExtension(`${manifest.publisher}.${manifest.name}`);
         assert.ok(extension, 'Packaged extension is loaded');
@@ -154,6 +162,13 @@ async function main() {
         '--extensionDevelopmentPath=' + path.join(extensions, installed), '--extensionTestsPath=' + __filename,
         '--disable-workspace-trust', '--skip-welcome', '--skip-release-notes', '--locale=' + locale,
         '--remote-debugging-port=' + port, '--disable-gpu'];
+    if (locale !== 'en') {
+        // The official CLI installs the pack before workbench has generated languagepacks.json.
+        const bootstrap = spawnSync(codeExe, [...args.filter(arg => !arg.startsWith('--remote-debugging-port='))], {encoding: 'utf8', env: {...environment, TEXT_MARKER_SMOKE_BOOTSTRAP: '1'}, windowsHide: true, timeout: 60000});
+        fs.writeFileSync(path.join(root, 'bootstrap.log'), (bootstrap.stdout || '') + (bootstrap.stderr || ''));
+        assert.equal(bootstrap.status, 0, 'Initial workbench language-pack scan: ' + bootstrap.stderr);
+        assert.ok(JSON.parse(fs.readFileSync(path.join(root, 'user', 'languagepacks.json')))[locale]);
+    }
     const log = fs.openSync(path.join(root, 'code.log'), 'w');
     const processHandle = spawn(codeExe, args, {env: environment, windowsHide: true, stdio: ['ignore', log, log]});
     let exited = false;

@@ -66,7 +66,9 @@ Screenshots, renderer styles, menu labels and the actual saved rule remain under
 `__host-smoke/`; failed runs are preserved. The test closes its own window automatically.
 Personal VS Code profiles, settings and windows are not used by this test.
 
-The Windows VS Code 1.108.2 English run has passed. The Simplified Chinese run currently
-fails the actual display-locale assertion (`en` instead of `zh-cn`) despite the installed
-language pack; Chinese host verification remains open. Translation resource/stub tests
-do not replace this check.
+English, Simplified Chinese and Traditional Chinese have passed this smoke test on Windows
+VS Code 1.108.2. Installing a language pack through the CLI does not immediately generate
+`languagepacks.json`: the first workbench scan creates it after early startup locale resolution.
+The script first bootstraps the isolated workbench and waits for that official cache, then restarts
+its test window with the requested display locale. It asserts the actual host locale before testing
+translated UI; resource/stub tests do not replace this check.
