@@ -1,6 +1,8 @@
 
 export const EXTENSION_ID = 'textmarker';
 
+export const PALETTE_MENU_SIZE = 30;
+
 export const EXTENSION_NAME = 'TextMarker';
 
 export enum Event {

@@ -1,16 +1,11 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import {task} from 'fp-ts/lib/Task';
-import {none} from 'fp-ts/lib/Option';
-import {EventEmitter} from 'events';
 import {setTestLanguage} from '../stub-vscode';
-import RegexReader from '../../lib/regex-reader';
-import MatchingModeRegistry from '../../lib/matching-mode-registry';
+import PatternReader from '../../lib/pattern-reader';
+import RegexPattern from '../../lib/pattern/regex';
+import {fakeInputBox} from '../helpers/input-box';
 import WindowComponent from '../../lib/vscode/window';
-import DecorationVariationReader from '../../lib/decoration/decoration-variation-reader';
-import {Decoration} from '../../lib/entities/decoration';
-import PatternFactory from '../../lib/pattern/pattern-factory';
 import {mockType} from '../helpers/mock';
 
 const root = path.resolve(__dirname, '../../..');
@@ -53,28 +48,27 @@ suite('Localization resources', () => {
         }
     });
     for (const [locale,regexTitle,errorText,editTitle] of [
-        ['en', 'Enter a regular expression without enclosing / characters', 'Invalid regular expression.', 'Edit matching text'],
-        ['zh-cn', '输入正则表达式, 不需要两端的 /', '正则表达式无效', '修改匹配文本'],
-        ['zh-tw', '輸入規則運算式, 不需要兩端的 /', '規則運算式無效', '修改比對文字'],
-        ['de', 'Enter a regular expression without enclosing / characters', 'Invalid regular expression.', 'Edit matching text']
+        ['en', 'Enter matching text or a regular expression without enclosing / characters', 'Invalid regular expression.', 'Edit matching rule'],
+        ['zh-cn', '输入匹配文本或正则表达式, 不需要两端的 /', '正则表达式无效', '修改匹配规则'],
+        ['zh-tw', '輸入比對文字或規則運算式, 不需要兩端的 /', '規則運算式無效', '修改比對規則'],
+        ['de', 'Enter matching text or a regular expression without enclosing / characters', 'Invalid regular expression.', 'Edit matching rule']
     ]) {
         test(`uses ${locale} or English fallback for prompts, validation and editing`, async () => {
             setTestLanguage(locale);
-            const modes = new MatchingModeRegistry(false, false, new EventEmitter());
-            let input: any;
-            let labels: string[] = [];
+            const fake = fakeInputBox();
+            const input = fake.input;
             const window = mockType<WindowComponent>({
-                showInputBox: (options: any) => {input = options;return task.of(none);},
-                showQuickPick: (items: any[]) => {labels = items.map(item => item.label);return task.of(none);}
+                createInputBox: () => input
             });
-            await new RegexReader(modes, window).read()();
-            assert.equal(input.placeHolder, regexTitle);
-            assert.equal(input.validateInput('au8_data\\[\\d+\\]'), undefined);
-            for (const value of ['[', '(', '\\', 'a{2,1}']) assert.ok(input.validateInput(value).startsWith(errorText));
-            const decoration = new Decoration('test', new PatternFactory(modes).create({phrase: 'au8_data[0]'}), '#00BCD4');
-            await new DecorationVariationReader(window).read(decoration)();
-            assert.equal(labels.length, 4);
-            assert.equal(labels[2], editTitle);
+            const pending = new PatternReader(window).read(new RegexPattern({phrase: 'a'}))();
+            assert.equal(input.placeholder, regexTitle);
+            for (const value of ['[', '(', '\\', 'a{2,1}']) {
+                input.value = value;fake.events.emit('change', value);
+                assert.ok(String(input.validationMessage).startsWith(errorText));
+            }
+            fake.events.emit('hide');
+            await pending;
+            assert.equal(input.title, editTitle);
         });
     }
 });

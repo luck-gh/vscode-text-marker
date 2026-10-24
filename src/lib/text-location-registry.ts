@@ -26,6 +26,16 @@ export default class TextLocationRegistry {
         });
     }
 
+    queryDecorationIds(editorId: string, range: FlatRange): string[] {
+        return pipe(
+            this.recordMap.get(editorId),
+            O.map(decorations => [...decorations.entries()]
+                .filter(([_, ranges]) => ranges.some(this.isPointingRange(range)))
+                .map(([id]) => id)),
+            O.getOrElse(() => [] as string[])
+        );
+    }
+
     queryDecorationId(editorId: string, range: FlatRange): O.Option<string> {
         return pipe(
             this.findDecorationIdAndRanges(editorId, range),

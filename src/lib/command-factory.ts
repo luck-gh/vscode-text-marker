@@ -1,5 +1,6 @@
 import ConfigStore from './config-store';
 import SetHighlightColourCommand from './commands/set-highlight-colour';
+import SetPaletteColourCommand from './commands/set-palette-colour';
 import ConfigTargetPicker from './config-target-picker';
 import Debouncer from './debouncer';
 import DecorationOperatorFactory from './decoration/decoration-operator-factory';
@@ -7,7 +8,7 @@ import DecorationRegistry from './decoration/decoration-registry';
 import DecorationPicker from './decoration/decoration-picker';
 import HighlightUsingRegexCommand from './commands/highlight-using-regex';
 import MatchingModeRegistry from './matching-mode-registry';
-import DecorationVariationReader from './decoration/decoration-variation-reader';
+import PatternReader from './pattern-reader';
 import RemoveAllHighlightsCommand from './commands/remove-all-highlights';
 import SaveAllHighlightsCommand from './commands/save-all-highlights';
 import SavedHighlightsRestorer from './saved-highlights-restorer';
@@ -59,6 +60,11 @@ export default class CommandFactory {
             this.getTextLocationRegistry(), this.getDecorationRegistry(), this.getDecorationOperatorFactory());
     }
 
+    createSetPaletteColourCommand(index: number) {
+        return new SetPaletteColourCommand(index, this.getConfigStore(), this.getWindowComponent(),
+            colour => this.createSetHighlightColourCommand(colour));
+    }
+
     createToggleHighlightCommand() {
         return new ToggleHighlightCommand(this.getMatchingModeRegistry(), this.getTextLocationRegistry(), this.getDecorationRegistry(), this.getDecorationTypeRegistry(), this.getWindowComponent(), this.getConfigStore());
     }
@@ -99,8 +105,9 @@ export default class CommandFactory {
         return new UpdateHighlightCommand(
             this.getDecorationOperatorFactory(),
             this.getDecorationRegistry(),
-            new DecorationVariationReader(this.getWindowComponent()),
-            this.getTextLocationRegistry()
+            new PatternReader(this.getWindowComponent()),
+            this.getTextLocationRegistry(),
+            this.getDecorationPicker()
         );
     }
 

@@ -187,29 +187,41 @@ suite('Custom highlight controls', () => {
         h.choose(colors[0]);
         assert.equal(h.registry.retrieveAll().length, 0);
     });
-    test('registers all ten menu commands and refreshes only relevant style changes', () => {
+    test('registers palette slots, updates visibility on changes, and refreshes only relevant styles', async () => {
         const h = createHarness();
         const manifest = require('../../../package.json');
         const commands: any[] = [];
-        let listener: (event: any) => void;
+        let listener: (event: any) => Promise<void>;
+        const contexts = new Map<string, boolean>();
+        const configuration = {hideStatusBarItems: true, highlightColors: colors};
         const factory: any = new Proxy({
             getDecorationOperatorFactory: () => ({createForVisibleEditors: () => h.operator}),
-            createSetHighlightColourCommand: (colour: string) => ({colour}),
-            getConfigStore: () => ({hideStatusBarItems: true}),
+            createSetPaletteColourCommand: (index: number) => ({index}),
+            getConfigStore: () => configuration,
             getEventBus: () => new EventEmitter()
         }, {get: (target: any, key: string) => key in target ? target[key] : () => ({})});
-        const vscode = {window: {onDidChangeActiveTextEditor() {}}, workspace: {
+        const vscode = {commands: {executeCommand: (_: string, key: string, value: boolean) => {contexts.set(key, value);return Promise.resolve();}}, window: {onDidChangeActiveTextEditor() {}}, workspace: {
             onDidChangeTextDocument() {},
-            onDidChangeConfiguration(fn: (event: any) => void) {listener = fn;}
+            onDidChangeConfiguration(fn: (event: any) => Promise<void>) {listener = fn;}
         }};
         const component = mockType<CommandComponent>({registerCommand: (item: any) => {commands.push(item);return {dispose() {}};}});
-        new AppIntegrator(factory as CommandFactory, vscode, component).integrate({subscriptions: []});
+        await new AppIntegrator(factory as CommandFactory, vscode, component).integrate({subscriptions: []});
         const menu = manifest.contributes.menus['textmarker.highlightColours'];
-        assert.deepEqual(menu.map((item: any) => commands.find(c => c.name === item.command).command.colour), colors);
+        assert.equal(menu.length, 30);
+        assert.deepEqual(menu.map((item: any) => commands.find(c => c.name === item.command).command.index), Array.from({length: 30}, (_, i) => i));
+        const visible = () => menu.filter((item: any) => contexts.get(item.when)).length;
+        assert.equal(visible(), 10);
+        for (const count of [2, 3, 1, 0, 30, 31]) {
+            configuration.highlightColors = Array.from({length: count}, () => '#123456');
+            await listener!({affectsConfiguration: (key: string) => key === 'textmarker.highlightColors'});
+            assert.equal(visible(), Math.min(30, count));
+            assert.equal(contexts.get('textmarker.hasPaletteColors'), count > 0);
+            assert.equal(configuration.highlightColors.length, count);
+        }
         h.choose(colors[0]);
-        listener!({affectsConfiguration: (key: string) => key === 'editor.fontSize'});
+        await listener!({affectsConfiguration: (key: string) => key === 'editor.fontSize'});
         assert.equal(h.getDisposed(), 0);
-        listener!({affectsConfiguration: (key: string) => key === 'textmarker.borderWidth'});
+        await listener!({affectsConfiguration: (key: string) => key === 'textmarker.borderWidth'});
         assert.equal(h.getDisposed(), 1);
     });
 });

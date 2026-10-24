@@ -1,10 +1,10 @@
 # Text Marker Custom
 
-[简体中文](https://github.com/luck-gh/vscode-text-marker/blob/v1.13.1/README.md) | English
+[简体中文](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/README.md) | English
 
-![Text Marker Custom](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.13.1/images/text-marker-custom.png)
+![Text Marker Custom](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/text-marker-custom.png)
 
-Ten-color text highlights with configurable borders and corners, and English and Chinese UI. Select text such as `au8_data[0]` to highlight full matches, or use a regular expression.
+Configurable text highlights with configurable borders and corners, and English and Chinese UI. Select text such as `au8_data[0]` to highlight full matches, or use a regular expression.
 
 Published by `luck-gh` as `luck-gh.text-marker-custom`. Based on [Text Marker by Ryuichi Inagaki](https://github.com/ryu1kn/vscode-text-marker), with the original MIT notice preserved. This fork uses a separate name and an original highlighter icon, and removes extension usage telemetry and its dependencies.
 
@@ -12,18 +12,23 @@ The links above switch this introduction manually. Extension menus, setting desc
 
 ## Installation and migration
 
-Requires VS Code 1.73 or later. Download the VSIX from the [GitHub Release](https://github.com/luck-gh/vscode-text-marker/releases/tag/v1.13.1) and run `Extensions: Install from VSIX...`. After Marketplace publication, the extension can also be found by ID `luck-gh.text-marker-custom`.
+Requires VS Code 1.73 or later. Download the VSIX from the [GitHub Release](https://github.com/luck-gh/vscode-text-marker/releases/tag/v1.14.0) and run `Extensions: Install from VSIX...`. After Marketplace publication, the extension can also be found by ID `luck-gh.text-marker-custom`.
 
 Disable or uninstall the original `ryu1kn.text-marker` first. Both editions use the same `textmarker.*` setting and command identifiers and must not be enabled together. Saved highlight rules, personal colors and custom keybindings retain those identifiers. Installation does not rewrite user configuration. Run `Developer: Reload Window` if an older edition is still active.
 
 ## Usage
 
 - With the recommended keys below, Ctrl+H adds a highlight using the first unused palette color. Repeating Ctrl+H cycles an existing rule through `textmarker.highlightColors`, wrapping to the first color without removing it. Ctrl+Alt+H opens the picker to remove a chosen rule.
-- Select text, hover over **Set Highlight** in the editor context menu, and choose one of ten fixed colors. This menu selects a color directly; Ctrl+H cycles through the palette.
+- Select text and hover over **Set Highlight** to open its native submenu. **Color 1**, **Color 2**, and subsequent entries follow the current `textmarker.highlightColors` order, up to 30 entries. Choosing entry N uses the current Nth configured color. Configuration changes apply immediately without reinstallation or reload. Labels are fixed numbers rather than dynamic color names. An empty palette hides the submenu.
 - Choose a new color on an existing highlight to recolor it while preserving its regex expression and matching options.
 - Border, radius and opacity changes refresh existing highlights immediately.
-- Use the command palette to highlight with regex, edit rules, clear all highlights or save all highlights.
+- Choose **Edit highlight rules** to open the matching input directly. Use one input for literal text or regex, with `Aa` (Match Case), `Ab|` (Match Whole Words), and `.*` (Regular Expression) buttons at the top right. The prompt displays all three current states. Existing rules open with their own modes; Enter applies, Esc discards, and invalid regex is explained inline and cannot be applied. The matching options apply to this rule and leave its color and global defaults unchanged. If the cursor or selection does not identify one rule, choose the rule first.
+- **Highlight using a regular expression** opens the same input with regex enabled; it can also switch to literal text. Use the command palette to clear or save all highlights.
 - Switch case and whole-word matching modes from the status bar. Next/previous matching-highlight commands remain available from the command palette.
+
+The context menu contains only four highlight entries: **Set Highlight**, **Edit Highlight Rules**, **Remove Selected Highlight**, and **Clear All Highlights**, each with its own visibility setting below. The submenu supports up to 30 colors; further colors still participate in Ctrl+H cycling and automatic allocation. The old fixed ten-color commands are replaced by configuration-driven numbered colors.
+
+On VS Code 1.108, the native extension API places these buttons on the title bar above the input, so their position differs from the inline buttons in Ctrl+F. Read the prompt below the input for the current on/off states.
 
 | Setting | Meaning |
 | --- | --- |
@@ -31,7 +36,7 @@ Disable or uninstall the original `ryu1kn.text-marker` first. Both editions use 
 | `textmarker.borderStyle` | `solid`, `dashed`, `dotted`, `double` or `none`. |
 | `textmarker.borderRadius` | Radius in pixels; `0` is square and `999` is pill-shaped. |
 | `textmarker.defaultHighlightOpacity` | Background opacity between `0` and `1`. |
-| `textmarker.highlightColors` | Palette for automatic allocation and cycling in order. The **Set Highlight** submenu uses ten fixed presets and can be shown or hidden with `commandsOnContextMenu.toggleHighlight`. |
+| `textmarker.highlightColors` | Palette for automatic allocation and cycling in order. The **Set Highlight** submenu follows the first 30 configured colors and can be shown or hidden with `commandsOnContextMenu.toggleHighlight`. |
 | `textmarker.autoSelectDistinctiveTextColor` | `false` preserves syntax text colors. |
 
 ## Recommended settings
@@ -65,17 +70,11 @@ Merge these entries into your user `settings.json`. Each line explains its effec
     "textmarker.borderStyle": "solid",  // Use a continuous outline; alternatives are dashed, dotted, double and none.
     "textmarker.borderRadius": 999,     // Radius in px: 999 makes pill-shaped ends for a softer outline; 0 gives square corners.
 
-    "textmarker.commandsOnContextMenu": {   // true shows a context command and false hides it; toggleHighlight controls the fixed ten-color Set Highlight submenu.
-        "toggleHighlight": true,            // Show Set Highlight; hover over it to choose one of the ten fixed colors directly.
+    "textmarker.commandsOnContextMenu": {   // true shows a context command and false hides it; toggleHighlight controls the Set Highlight palette submenu.
+        "toggleHighlight": true,            // Show Set Highlight; hover to choose directly from the first 30 configured colors.
         "unhighlight": true,                // Show removal of a selected rule, keeping cancellation separate from cycling.
         "clearAllHighlight": true,          // Show Clear All to reset the current collection quickly when changing tasks.
-        "updateHighlight": true,            // Show rule editing to adjust the expression, color or matching options in place.
-        "goToNextHighlight": false,         // Hide forward navigation to reduce menu size; the command palette still provides it.
-        "goToPreviousHighlight": false,     // Hide backward navigation for the same reason; it remains in the command palette.
-        "highlightUsingRegex": true,        // Show regex highlighting to mark related strings such as all array indices with one rule.
-        "toggleCaseSensitivity": false,     // Hide per-rule case switching to reduce clutter; edit a rule when an exception is needed.
-        "toggleWholeMatch": false,          // Hide per-rule whole-word switching; rule editing remains available when needed.
-        "saveAllHighlights": false          // Hide persistence because temporary reading marks are usually enough; save explicitly from the palette when needed.
+        "updateHighlight": true             // Show rule editing to adjust text, case, whole-word and regex options; use Set Highlight to change color.
     }
 }
 ```
@@ -106,21 +105,23 @@ These three animations are reused from the [original MIT-licensed project](https
 
 Highlight and unhighlight (original behavior):
 
-The first animation shows the old toggle command removing a highlight on its second invocation. Since 1.13.0, **Cycle Highlight Color** adds or recolors instead. Use **Unhighlight** (recommended Ctrl+Alt+H) to remove a rule. The fixed ten-color submenu and current styles are not shown in these original animations.
+The first animation shows the old toggle command removing a highlight on its second invocation. Since 1.13.0, **Cycle Highlight Color** adds or recolors instead. Use **Unhighlight** (recommended Ctrl+Alt+H) to remove a rule. The current configuration-driven numbered color submenu and styles are not shown in these original animations.
 
-![Original demonstration: highlight and unhighlight](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.13.1/images/animations/public.gif)
+![Original demonstration: highlight and unhighlight](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/animations/public.gif)
 
 Case and whole-word matching:
 
-![Original demonstration: matching modes](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.13.1/images/animations/ignore-case-and-whole-match.gif)
+![Original demonstration: matching modes](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/animations/ignore-case-and-whole-match.gif)
 
 Edit an existing rule:
 
-![Original demonstration: edit highlight rules](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.13.1/images/animations/update-highlight.gif)
+Since 1.14.0, the action-selection step shown in this original animation is removed. Editing opens the rule input directly, with `Aa` / `Ab|` / `.*` buttons.
+
+![Original demonstration: edit highlight rules](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/animations/update-highlight.gif)
 
 ## Development, feedback and license
 
 - [Report an issue](https://github.com/luck-gh/vscode-text-marker/issues).
-- [Build and test instructions](https://github.com/luck-gh/vscode-text-marker/blob/v1.13.1/CONTRIBUTING.md), including compilation, stub tests and isolated real-host checks in all three display languages.
-- [Changelog](https://github.com/luck-gh/vscode-text-marker/blob/v1.13.1/CHANGELOG.md).
-- [MIT license](https://github.com/luck-gh/vscode-text-marker/blob/v1.13.1/LICENSE.txt), preserving `Copyright (c) 2016 Ryuichi Inagaki`.
+- [Build and test instructions](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/CONTRIBUTING.md), including compilation, stub tests and isolated real-host checks in all three display languages.
+- [Changelog](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/CHANGELOG.md).
+- [MIT license](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/LICENSE.txt), preserving `Copyright (c) 2016 Ryuichi Inagaki`.

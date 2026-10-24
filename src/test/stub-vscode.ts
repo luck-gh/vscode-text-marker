@@ -13,6 +13,7 @@ const bundles: {[language: string]: {[message: string]: string}} = {
 };
 const mockVscode = {
     l10n: {t: (message: string) => bundles[testLanguage] ? bundles[testLanguage][message] || message : message},
+    ThemeIcon: function (id: string, color?: {id: string}) {return {id, color};},
     OverviewRulerLane: {Center: 2},
     StatusBarAlignment: {Right: 2},
     TextEditorRevealType: {InCenterIfOutsideViewport: 2},

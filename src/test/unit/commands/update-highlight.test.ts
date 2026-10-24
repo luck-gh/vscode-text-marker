@@ -1,105 +1,75 @@
-import {any, mock, mockType, verify, when} from '../../helpers/mock';
-
+import * as assert from 'assert';
+import {some, none} from 'fp-ts/lib/Option';
+import {task} from 'fp-ts/lib/Task';
 import UpdateHighlightCommand from '../../../lib/commands/update-highlight';
 import DecorationOperatorFactory from '../../../lib/decoration/decoration-operator-factory';
+import DecorationOperator from '../../../lib/decoration/decoration-operator';
 import DecorationRegistry from '../../../lib/decoration/decoration-registry';
-import DecorationVariationReader from '../../../lib/decoration/decoration-variation-reader';
+import DecorationPicker from '../../../lib/decoration/decoration-picker';
+import {Decoration} from '../../../lib/entities/decoration';
+import PatternReader from '../../../lib/pattern-reader';
 import StringPattern from '../../../lib/pattern/string';
+import RegexPattern from '../../../lib/pattern/regex';
 import TextLocationRegistry from '../../../lib/text-location-registry';
 import TextEditor from '../../../lib/vscode/text-editor';
-import DecorationOperator from '../../../lib/decoration/decoration-operator';
-import {none, some} from 'fp-ts/lib/Option';
-import {Decoration} from '../../../lib/entities/decoration';
-import {task} from 'fp-ts/lib/Task';
+import {mockType} from '../../helpers/mock';
 
 suite('UpdateHighlightCommand', () => {
-
-    const registeredRange = {start: 10, end: 20};
-    const unregisteredRange = {start: 0, end: 0};
-
-    const textLocationRegistry = new TextLocationRegistry();
-    textLocationRegistry.register('EDITOR_ID', 'DECORATION_ID', [registeredRange]);
-
-    suite('When the cursor is on highlight', () => {
-
-        const editor = mockType<TextEditor>({id: 'EDITOR_ID', selectedText: 'SELECTED', selection: registeredRange});
-
-        const pattern = mock(StringPattern);
-        const oldDecoration = new Decoration('DECORATION_ID', pattern, 'pink');
-        const newDecoration = new Decoration('DECORATION_ID', pattern, 'yellow');
-
-        const decorationRegistry = mock(DecorationRegistry);
-        when(decorationRegistry.inquireById('DECORATION_ID')).thenReturn(some(oldDecoration));
-
-        let decorationOperator: DecorationOperator;
-        let decorationOperatorFactory: DecorationOperatorFactory;
-
-        setup(() => {
-            const deps = createDecorationOperator();
-            decorationOperator = deps.decorationOperator;
-            decorationOperatorFactory = deps.decorationOperatorFactory;
-        });
-
-        test('it updates decoration', async () => {
-            const patternVariationReader = mock(DecorationVariationReader);
-            when(patternVariationReader.read(oldDecoration)).thenReturn(task.of(some(newDecoration)));
-
-            const command = new UpdateHighlightCommand(
-                decorationOperatorFactory,
-                decorationRegistry,
-                patternVariationReader,
-                textLocationRegistry
-            );
-
-            await command.execute(editor);
-
-            verify(decorationOperator.updateDecoration(oldDecoration, newDecoration));
-        });
-
-        test('it does nothing if a new pattern is not given by user', async () => {
-            const patternVariationReader = mock(DecorationVariationReader);
-            when(patternVariationReader.read(any())).thenReturn(task.of(none));
-
-            const command = new UpdateHighlightCommand(
-                decorationOperatorFactory,
-                decorationRegistry,
-                patternVariationReader,
-                textLocationRegistry
-            );
-
-            await command.execute(editor);
-
-            verify(decorationOperator.updateDecoration(any(), any()), {times: 0});
-        });
-    });
-
-    suite('When the cursor is NOT on highlight', () => {
-        const deps = createDecorationOperator();
-        const {decorationOperator, decorationOperatorFactory} = deps;
-
-        const decorationRegistry = mock(DecorationRegistry);
-        const patternVariationReader = mock(DecorationVariationReader);
-
-        const editor = mockType<TextEditor>({id: 'EDITOR_ID', selectedText: 'SELECTED', selection: unregisteredRange});
-
-        test('it does nothing', async () => {
-            const command = new UpdateHighlightCommand(
-                decorationOperatorFactory,
-                decorationRegistry,
-                patternVariationReader,
-                textLocationRegistry
-            );
-
-            await command.execute(editor);
-
-            verify(decorationOperator.updateDecoration(any(), any()), {times: 0});
-        });
-    });
-
-    function createDecorationOperator() {
-        const decorationOperator = mock(DecorationOperator);
-        const decorationOperatorFactory = mock(DecorationOperatorFactory);
-        when(decorationOperatorFactory.createForVisibleEditors()).thenReturn(decorationOperator);
-        return {decorationOperator, decorationOperatorFactory};
+    function harness(ids: string[], canceled = false) {
+        const initial = new Decoration('original', new StringPattern({phrase: 'marker', wholeMatch: true}), '#5C8DFF');
+        const replacement = new RegexPattern({phrase: 'mark.*', ignoreCase: true, wholeMatch: false});
+        let picked = 0;
+        let read = 0;
+        const updates: Decoration[][] = [];
+        const locations = new TextLocationRegistry();
+        for (const id of ids) locations.register('editor', id, [{start: 0, end: 6}]);
+        const command = new UpdateHighlightCommand(
+            mockType<DecorationOperatorFactory>({createForVisibleEditors: () => mockType<DecorationOperator>({
+                updateDecoration: (old: Decoration, updated: Decoration) => updates.push([old, updated])
+            })}),
+            mockType<DecorationRegistry>({inquireById: () => some(initial)}),
+            mockType<PatternReader>({read: (pattern: any) => {
+                assert.equal(pattern, initial.pattern);read++;
+                return task.of(canceled ? none : some(replacement));
+            }}), locations,
+            mockType<DecorationPicker>({pick: () => {picked++;return task.of(canceled ? none : some(initial));}})
+        );
+        return {command, initial, updates, get picked() {return picked;}, get read() {return read;}};
     }
+    const editor = mockType<TextEditor>({id: 'editor', selection: {start: 0, end: 6}});
+    test('opens the uniquely matched rule directly and preserves its identity and color', async () => {
+        const h = harness(['original']);
+        await h.command.execute(editor);
+        assert.equal(h.picked, 0);
+        assert.equal(h.read, 1);
+        assert.equal(h.updates.length, 1);
+        const [old, updated] = h.updates[0];
+        assert.equal(old, h.initial);
+        assert.equal(updated.id, old.id);
+        assert.equal(updated.colour, old.colour);
+        assert.equal(updated.pattern.type, 'RegExp');
+        assert.equal(updated.pattern.ignoreCase, true);
+        assert.equal(updated.pattern.wholeMatch, false);
+    });
+    for (const ids of [[], ['first', 'overlapping']]) {
+        test(`picks the rule when the selection identifies ${ids.length} rules`, async () => {
+            const h = harness(ids);
+            await h.command.execute(editor);
+            assert.equal(h.picked, 1);
+            assert.equal(h.read, 1);
+            assert.equal(h.updates.length, 1);
+        });
+    }
+    test('leaves the existing rule untouched on input cancellation', async () => {
+        const h = harness(['original'], true);
+        await h.command.execute(editor);
+        assert.equal(h.updates.length, 0);
+        assert.equal(h.initial.pattern.phrase, 'marker');
+    });
+    test('does not open an editor when the rule picker is canceled', async () => {
+        const h = harness([], true);
+        await h.command.execute(editor);
+        assert.equal(h.read, 0);
+        assert.equal(h.updates.length, 0);
+    });
 });

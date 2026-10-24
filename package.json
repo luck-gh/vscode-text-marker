@@ -2,14 +2,14 @@
   "name": "text-marker-custom",
   "displayName": "Text Marker Custom",
   "description": "%extension.description%",
-  "version": "1.13.1",
+  "version": "1.14.0",
   "publisher": "luck-gh",
   "license": "SEE LICENSE IN LICENSE.txt",
   "icon": "images/text-marker-custom.png",
   "bugs": {
     "url": "https://github.com/luck-gh/vscode-text-marker/issues"
   },
-  "homepage": "https://github.com/luck-gh/vscode-text-marker/blob/v1.13.1/README.md",
+  "homepage": "https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/luck-gh/vscode-text-marker.git"
@@ -107,48 +107,24 @@
           "description": "%setting.commandsOnContextMenu%",
           "type": "object",
           "properties": {
-            "highlightUsingRegex": {
-              "type": "boolean"
-            },
             "toggleHighlight": {
               "type": "boolean"
             },
             "unhighlight": {
               "type": "boolean"
             },
-            "toggleCaseSensitivity": {
-              "type": "boolean"
-            },
-            "toggleWholeMatch": {
-              "type": "boolean"
-            },
             "clearAllHighlight": {
-              "type": "boolean"
-            },
-            "saveAllHighlights": {
               "type": "boolean"
             },
             "updateHighlight": {
               "type": "boolean"
-            },
-            "goToNextHighlight": {
-              "type": "boolean"
-            },
-            "goToPreviousHighlight": {
-              "type": "boolean"
             }
           },
           "default": {
-            "highlightUsingRegex": false,
             "toggleHighlight": true,
-            "unhighlight": false,
-            "toggleCaseSensitivity": false,
-            "toggleWholeMatch": false,
-            "clearAllHighlight": false,
-            "saveAllHighlights": false,
-            "updateHighlight": true,
-            "goToNextHighlight": true,
-            "goToPreviousHighlight": true
+            "unhighlight": true,
+            "clearAllHighlight": true,
+            "updateHighlight": true
           },
           "additionalProperties": false
         },
@@ -289,159 +265,481 @@
         "category": "TextMarker"
       },
       {
-        "command": "textmarker.highlightCyan",
-        "title": "%command.highlightCyan%",
+        "command": "textmarker.paletteColor1",
+        "title": "%command.paletteColor1%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor1"
       },
       {
-        "command": "textmarker.highlightBlue",
-        "title": "%command.highlightBlue%",
+        "command": "textmarker.paletteColor2",
+        "title": "%command.paletteColor2%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor2"
       },
       {
-        "command": "textmarker.highlightYellow",
-        "title": "%command.highlightYellow%",
+        "command": "textmarker.paletteColor3",
+        "title": "%command.paletteColor3%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor3"
       },
       {
-        "command": "textmarker.highlightPurple",
-        "title": "%command.highlightPurple%",
+        "command": "textmarker.paletteColor4",
+        "title": "%command.paletteColor4%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor4"
       },
       {
-        "command": "textmarker.highlightGreen",
-        "title": "%command.highlightGreen%",
+        "command": "textmarker.paletteColor5",
+        "title": "%command.paletteColor5%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor5"
       },
       {
-        "command": "textmarker.highlightRed",
-        "title": "%command.highlightRed%",
+        "command": "textmarker.paletteColor6",
+        "title": "%command.paletteColor6%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor6"
       },
       {
-        "command": "textmarker.highlightPink",
-        "title": "%command.highlightPink%",
+        "command": "textmarker.paletteColor7",
+        "title": "%command.paletteColor7%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor7"
       },
       {
-        "command": "textmarker.highlightLime",
-        "title": "%command.highlightLime%",
+        "command": "textmarker.paletteColor8",
+        "title": "%command.paletteColor8%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor8"
       },
       {
-        "command": "textmarker.highlightTeal",
-        "title": "%command.highlightTeal%",
+        "command": "textmarker.paletteColor9",
+        "title": "%command.paletteColor9%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor9"
       },
       {
-        "command": "textmarker.highlightSilver",
-        "title": "%command.highlightSilver%",
+        "command": "textmarker.paletteColor10",
+        "title": "%command.paletteColor10%",
         "category": "TextMarker",
-        "enablement": "editorTextFocus"
+        "enablement": "textmarker.paletteColor10"
+      },
+      {
+        "command": "textmarker.paletteColor11",
+        "title": "%command.paletteColor11%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor11"
+      },
+      {
+        "command": "textmarker.paletteColor12",
+        "title": "%command.paletteColor12%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor12"
+      },
+      {
+        "command": "textmarker.paletteColor13",
+        "title": "%command.paletteColor13%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor13"
+      },
+      {
+        "command": "textmarker.paletteColor14",
+        "title": "%command.paletteColor14%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor14"
+      },
+      {
+        "command": "textmarker.paletteColor15",
+        "title": "%command.paletteColor15%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor15"
+      },
+      {
+        "command": "textmarker.paletteColor16",
+        "title": "%command.paletteColor16%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor16"
+      },
+      {
+        "command": "textmarker.paletteColor17",
+        "title": "%command.paletteColor17%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor17"
+      },
+      {
+        "command": "textmarker.paletteColor18",
+        "title": "%command.paletteColor18%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor18"
+      },
+      {
+        "command": "textmarker.paletteColor19",
+        "title": "%command.paletteColor19%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor19"
+      },
+      {
+        "command": "textmarker.paletteColor20",
+        "title": "%command.paletteColor20%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor20"
+      },
+      {
+        "command": "textmarker.paletteColor21",
+        "title": "%command.paletteColor21%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor21"
+      },
+      {
+        "command": "textmarker.paletteColor22",
+        "title": "%command.paletteColor22%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor22"
+      },
+      {
+        "command": "textmarker.paletteColor23",
+        "title": "%command.paletteColor23%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor23"
+      },
+      {
+        "command": "textmarker.paletteColor24",
+        "title": "%command.paletteColor24%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor24"
+      },
+      {
+        "command": "textmarker.paletteColor25",
+        "title": "%command.paletteColor25%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor25"
+      },
+      {
+        "command": "textmarker.paletteColor26",
+        "title": "%command.paletteColor26%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor26"
+      },
+      {
+        "command": "textmarker.paletteColor27",
+        "title": "%command.paletteColor27%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor27"
+      },
+      {
+        "command": "textmarker.paletteColor28",
+        "title": "%command.paletteColor28%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor28"
+      },
+      {
+        "command": "textmarker.paletteColor29",
+        "title": "%command.paletteColor29%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor29"
+      },
+      {
+        "command": "textmarker.paletteColor30",
+        "title": "%command.paletteColor30%",
+        "category": "TextMarker",
+        "enablement": "textmarker.paletteColor30"
       }
     ],
     "menus": {
       "editor/context": [
         {
           "command": "textmarker.updateHighlight",
-          "group": "2_textmarker@2",
+          "group": "2_textmarker@1",
           "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.updateHighlight"
         },
         {
-          "command": "textmarker.goToNextHighlight",
-          "group": "2_textmarker@3",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.goToNextHighlight"
-        },
-        {
-          "command": "textmarker.goToPreviousHighlight",
-          "group": "2_textmarker@4",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.goToPreviousHighlight"
-        },
-        {
-          "command": "textmarker.highlightUsingRegex",
-          "group": "2_textmarker@5",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.highlightUsingRegex"
-        },
-        {
           "command": "textmarker.unhighlight",
-          "group": "2_textmarker@6",
+          "group": "2_textmarker@2",
           "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.unhighlight"
         },
         {
-          "command": "textmarker.toggleCaseSensitivity",
-          "group": "2_textmarker@7",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.toggleCaseSensitivity"
-        },
-        {
-          "command": "textmarker.toggleWholeMatch",
-          "group": "2_textmarker@8",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.toggleWholeMatch"
-        },
-        {
           "command": "textmarker.clearAllHighlight",
-          "group": "2_textmarker@9",
+          "group": "2_textmarker@3",
           "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.clearAllHighlight"
-        },
-        {
-          "command": "textmarker.saveAllHighlights",
-          "group": "2_textmarker@10",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.saveAllHighlights"
         },
         {
           "submenu": "textmarker.highlightColours",
           "group": "2_textmarker@0",
-          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.toggleHighlight"
+          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.toggleHighlight && textmarker.hasPaletteColors"
         }
       ],
       "textmarker.highlightColours": [
         {
-          "command": "textmarker.highlightCyan",
-          "group": "1_colours@1"
+          "command": "textmarker.paletteColor1",
+          "group": "1_colours@1",
+          "when": "textmarker.paletteColor1"
         },
         {
-          "command": "textmarker.highlightBlue",
-          "group": "1_colours@2"
+          "command": "textmarker.paletteColor2",
+          "group": "1_colours@2",
+          "when": "textmarker.paletteColor2"
         },
         {
-          "command": "textmarker.highlightYellow",
-          "group": "1_colours@3"
+          "command": "textmarker.paletteColor3",
+          "group": "1_colours@3",
+          "when": "textmarker.paletteColor3"
         },
         {
-          "command": "textmarker.highlightPurple",
-          "group": "1_colours@4"
+          "command": "textmarker.paletteColor4",
+          "group": "1_colours@4",
+          "when": "textmarker.paletteColor4"
         },
         {
-          "command": "textmarker.highlightGreen",
-          "group": "1_colours@5"
+          "command": "textmarker.paletteColor5",
+          "group": "1_colours@5",
+          "when": "textmarker.paletteColor5"
         },
         {
-          "command": "textmarker.highlightRed",
-          "group": "1_colours@6"
+          "command": "textmarker.paletteColor6",
+          "group": "1_colours@6",
+          "when": "textmarker.paletteColor6"
         },
         {
-          "command": "textmarker.highlightPink",
-          "group": "1_colours@7"
+          "command": "textmarker.paletteColor7",
+          "group": "1_colours@7",
+          "when": "textmarker.paletteColor7"
         },
         {
-          "command": "textmarker.highlightLime",
-          "group": "1_colours@8"
+          "command": "textmarker.paletteColor8",
+          "group": "1_colours@8",
+          "when": "textmarker.paletteColor8"
         },
         {
-          "command": "textmarker.highlightTeal",
-          "group": "1_colours@9"
+          "command": "textmarker.paletteColor9",
+          "group": "1_colours@9",
+          "when": "textmarker.paletteColor9"
         },
         {
-          "command": "textmarker.highlightSilver",
-          "group": "1_colours@10"
+          "command": "textmarker.paletteColor10",
+          "group": "1_colours@10",
+          "when": "textmarker.paletteColor10"
+        },
+        {
+          "command": "textmarker.paletteColor11",
+          "group": "1_colours@11",
+          "when": "textmarker.paletteColor11"
+        },
+        {
+          "command": "textmarker.paletteColor12",
+          "group": "1_colours@12",
+          "when": "textmarker.paletteColor12"
+        },
+        {
+          "command": "textmarker.paletteColor13",
+          "group": "1_colours@13",
+          "when": "textmarker.paletteColor13"
+        },
+        {
+          "command": "textmarker.paletteColor14",
+          "group": "1_colours@14",
+          "when": "textmarker.paletteColor14"
+        },
+        {
+          "command": "textmarker.paletteColor15",
+          "group": "1_colours@15",
+          "when": "textmarker.paletteColor15"
+        },
+        {
+          "command": "textmarker.paletteColor16",
+          "group": "1_colours@16",
+          "when": "textmarker.paletteColor16"
+        },
+        {
+          "command": "textmarker.paletteColor17",
+          "group": "1_colours@17",
+          "when": "textmarker.paletteColor17"
+        },
+        {
+          "command": "textmarker.paletteColor18",
+          "group": "1_colours@18",
+          "when": "textmarker.paletteColor18"
+        },
+        {
+          "command": "textmarker.paletteColor19",
+          "group": "1_colours@19",
+          "when": "textmarker.paletteColor19"
+        },
+        {
+          "command": "textmarker.paletteColor20",
+          "group": "1_colours@20",
+          "when": "textmarker.paletteColor20"
+        },
+        {
+          "command": "textmarker.paletteColor21",
+          "group": "1_colours@21",
+          "when": "textmarker.paletteColor21"
+        },
+        {
+          "command": "textmarker.paletteColor22",
+          "group": "1_colours@22",
+          "when": "textmarker.paletteColor22"
+        },
+        {
+          "command": "textmarker.paletteColor23",
+          "group": "1_colours@23",
+          "when": "textmarker.paletteColor23"
+        },
+        {
+          "command": "textmarker.paletteColor24",
+          "group": "1_colours@24",
+          "when": "textmarker.paletteColor24"
+        },
+        {
+          "command": "textmarker.paletteColor25",
+          "group": "1_colours@25",
+          "when": "textmarker.paletteColor25"
+        },
+        {
+          "command": "textmarker.paletteColor26",
+          "group": "1_colours@26",
+          "when": "textmarker.paletteColor26"
+        },
+        {
+          "command": "textmarker.paletteColor27",
+          "group": "1_colours@27",
+          "when": "textmarker.paletteColor27"
+        },
+        {
+          "command": "textmarker.paletteColor28",
+          "group": "1_colours@28",
+          "when": "textmarker.paletteColor28"
+        },
+        {
+          "command": "textmarker.paletteColor29",
+          "group": "1_colours@29",
+          "when": "textmarker.paletteColor29"
+        },
+        {
+          "command": "textmarker.paletteColor30",
+          "group": "1_colours@30",
+          "when": "textmarker.paletteColor30"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "textmarker.paletteColor1",
+          "when": "textmarker.paletteColor1"
+        },
+        {
+          "command": "textmarker.paletteColor2",
+          "when": "textmarker.paletteColor2"
+        },
+        {
+          "command": "textmarker.paletteColor3",
+          "when": "textmarker.paletteColor3"
+        },
+        {
+          "command": "textmarker.paletteColor4",
+          "when": "textmarker.paletteColor4"
+        },
+        {
+          "command": "textmarker.paletteColor5",
+          "when": "textmarker.paletteColor5"
+        },
+        {
+          "command": "textmarker.paletteColor6",
+          "when": "textmarker.paletteColor6"
+        },
+        {
+          "command": "textmarker.paletteColor7",
+          "when": "textmarker.paletteColor7"
+        },
+        {
+          "command": "textmarker.paletteColor8",
+          "when": "textmarker.paletteColor8"
+        },
+        {
+          "command": "textmarker.paletteColor9",
+          "when": "textmarker.paletteColor9"
+        },
+        {
+          "command": "textmarker.paletteColor10",
+          "when": "textmarker.paletteColor10"
+        },
+        {
+          "command": "textmarker.paletteColor11",
+          "when": "textmarker.paletteColor11"
+        },
+        {
+          "command": "textmarker.paletteColor12",
+          "when": "textmarker.paletteColor12"
+        },
+        {
+          "command": "textmarker.paletteColor13",
+          "when": "textmarker.paletteColor13"
+        },
+        {
+          "command": "textmarker.paletteColor14",
+          "when": "textmarker.paletteColor14"
+        },
+        {
+          "command": "textmarker.paletteColor15",
+          "when": "textmarker.paletteColor15"
+        },
+        {
+          "command": "textmarker.paletteColor16",
+          "when": "textmarker.paletteColor16"
+        },
+        {
+          "command": "textmarker.paletteColor17",
+          "when": "textmarker.paletteColor17"
+        },
+        {
+          "command": "textmarker.paletteColor18",
+          "when": "textmarker.paletteColor18"
+        },
+        {
+          "command": "textmarker.paletteColor19",
+          "when": "textmarker.paletteColor19"
+        },
+        {
+          "command": "textmarker.paletteColor20",
+          "when": "textmarker.paletteColor20"
+        },
+        {
+          "command": "textmarker.paletteColor21",
+          "when": "textmarker.paletteColor21"
+        },
+        {
+          "command": "textmarker.paletteColor22",
+          "when": "textmarker.paletteColor22"
+        },
+        {
+          "command": "textmarker.paletteColor23",
+          "when": "textmarker.paletteColor23"
+        },
+        {
+          "command": "textmarker.paletteColor24",
+          "when": "textmarker.paletteColor24"
+        },
+        {
+          "command": "textmarker.paletteColor25",
+          "when": "textmarker.paletteColor25"
+        },
+        {
+          "command": "textmarker.paletteColor26",
+          "when": "textmarker.paletteColor26"
+        },
+        {
+          "command": "textmarker.paletteColor27",
+          "when": "textmarker.paletteColor27"
+        },
+        {
+          "command": "textmarker.paletteColor28",
+          "when": "textmarker.paletteColor28"
+        },
+        {
+          "command": "textmarker.paletteColor29",
+          "when": "textmarker.paletteColor29"
+        },
+        {
+          "command": "textmarker.paletteColor30",
+          "when": "textmarker.paletteColor30"
         }
       ]
     },

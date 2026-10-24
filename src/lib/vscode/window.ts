@@ -28,6 +28,10 @@ export default class WindowComponent {
         return editor && new TextEditor(editor);
     }
 
+    createInputBox(): vscode.InputBox {
+        return this.window.createInputBox();
+    }
+
     showInputBox(options: InputBoxOptions): T.Task<O.Option<string>> {
         return pipe(
             () => this.window.showInputBox(options) as Promise<string>,

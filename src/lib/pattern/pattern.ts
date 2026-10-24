@@ -38,14 +38,6 @@ export default abstract class Pattern {
         });
     }
 
-    updatePhrase(newPhrase: string) {
-        return this.create({
-            phrase: newPhrase,
-            ignoreCase: this.ignoreCase,
-            wholeMatch: this.wholeMatch
-        });
-    }
-
     equalTo(other: Pattern) {
         return this.type === other.type &&
                 this.phrase === other.phrase &&

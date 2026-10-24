@@ -5,11 +5,15 @@ All notable changes to "Text Marker Custom" extension will be documented in this
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.13.1] - 2026-10-25
+## [1.14.0] - 2026-10-25
+### Added
+
+- Edit literal text and regular expressions in one native input with Match Case, Match Whole Words and Regular Expression buttons. Open a uniquely targeted rule directly, and preserve existing rule identity and color; validate before applying and discard canceled edits.
+
 ### Changed
 
-- Combine the editor context menu's highlight-color entries into the localized **Set Highlight** submenu. Hovering opens the ten fixed color commands; Ctrl+H continues to cycle colors.
-- Keep `textmarker.commandsOnContextMenu.toggleHighlight` as the visibility setting for the submenu, and retain `textmarker.toggleHighlight` in the command palette and existing keybindings.
+- Keep four editor context entries: Set Highlight, Edit Highlight Rules, Remove Selected Highlight and Clear All Highlights. The native Set Highlight submenu displays numbered entries for the first 30 configured palette colors, updates immediately and reads each color by its current index. Empty palettes hide the submenu; Ctrl+H and automatic allocation continue to use the full palette.
+- Keep four effective `textmarker.commandsOnContextMenu` visibility settings, remove the six obsolete settings and the old fixed-color commands, and retain `textmarker.toggleHighlight` and the other functional command IDs.
 
 ## [1.13.0] - 2026-10-24
 ### Changed
