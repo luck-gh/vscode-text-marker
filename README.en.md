@@ -35,7 +35,7 @@ Disable or uninstall the original `ryu1kn.text-marker` first. Both editions use 
 
 ## Recommended settings
 
-This everyday configuration uses the ten-color palette, 25% background opacity and pill-shaped borders. Automatic contrasting text remains disabled, as it is by default; the explicit `false` preserves syntax text colors.
+This everyday configuration uses the ten-color palette, 25% background opacity (75% transparent) and pill-shaped borders. Automatic contrasting text remains disabled, as it is by default; the explicit `false` preserves syntax text colors.
 
 Merge these entries into your user `settings.json`. The JSONC comments can be retained.
 
@@ -59,7 +59,7 @@ Merge these entries into your user `settings.json`. The JSONC comments can be re
         "#B0BEC5"  // Silver
     ],
 
-    // Use 25% background opacity and preserve syntax text colors.
+    // Use 25% background opacity (75% transparent) and preserve syntax text colors.
     "textmarker.defaultHighlightOpacity": 0.25,
     "textmarker.autoSelectDistinctiveTextColor": false,
 

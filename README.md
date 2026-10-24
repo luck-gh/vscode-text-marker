@@ -20,7 +20,7 @@
 
 - 选中文本, 在右键的高亮颜色子菜单中选择十种颜色之一.
 - 在已有高亮上重新选色可直接换色, 保留原正则表达式和大小写, 整词匹配选项.
-- 修改边框, 圆角或透明度后, 已有高亮立即刷新.
+- 修改边框, 圆角或背景不透明度后, 已有高亮立即刷新.
 - 使用命令面板中的正则高亮, 编辑高亮规则, 清除全部高亮, 保存全部高亮等命令.
 - 状态栏可切换大小写与整词匹配模式. 下一个或上一个相同高亮命令可通过命令面板调用.
 
@@ -29,13 +29,13 @@
 | `textmarker.borderWidth` | 边框宽度, 单位 px; `0` 关闭边框. |
 | `textmarker.borderStyle` | `solid`, `dashed`, `dotted`, `double` 或 `none`. |
 | `textmarker.borderRadius` | 圆角半径, 单位 px; `0` 为直角, `999` 为胶囊形. |
-| `textmarker.defaultHighlightOpacity` | 背景透明度, 范围 `0` 到 `1`. |
+| `textmarker.defaultHighlightOpacity` | 背景不透明度, 范围 `0` 到 `1`; `0` 为完全透明. |
 | `textmarker.highlightColors` | 自动分配高亮使用的调色板. 右键十色菜单为固定预设. |
 | `textmarker.autoSelectDistinctiveTextColor` | `false` 保留语法高亮文字颜色. |
 
 ## 推荐配置
 
-这套配置采用日常使用的十色调色板, 25% 背景透明度和胶囊形边框. 自动文字对比沿用默认关闭行为, 在推荐块中显式设为 `false`, 以保留原有语法字色.
+这套配置采用日常使用的十色调色板, 25% 背景不透明度 (75% 透明) 和胶囊形边框. 自动文字对比沿用默认关闭行为, 在推荐块中显式设为 `false`, 以保留原有语法字色.
 
 把下面的配置项合并到用户 `settings.json` 中. 这是 JSONC, 行注释可直接保留.
 
@@ -59,7 +59,7 @@
         "#B0BEC5"  // 银灰色
     ],
 
-    // 背景透明度为 25%, 保留原有语法高亮文字颜色.
+    // 背景不透明度为 25% (75% 透明), 保留原有语法高亮文字颜色.
     "textmarker.defaultHighlightOpacity": 0.25,
     "textmarker.autoSelectDistinctiveTextColor": false,
 
