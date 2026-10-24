@@ -30,5 +30,6 @@
   "Match whole words: Off": "全字比對: 關",
   "Match whole words: On (click to turn off)": "全字比對: 開 (點擊關閉)",
   "Match whole words: Off (click to turn on)": "全字比對: 關 (點擊開啟)",
-  "This palette color is no longer available. Check textmarker.highlightColors.": "此色盤色彩已無法使用, 請檢查 textmarker.highlightColors."
+  "This palette color is no longer available. Check textmarker.highlightColors.": "此色盤色彩已無法使用, 請檢查 textmarker.highlightColors.",
+  "Add rule": "新增規則"
 }

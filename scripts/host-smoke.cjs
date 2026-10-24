@@ -24,7 +24,11 @@ async function until(read, label, timeout = 45000) {
 exports.run = async () => {
     const vscode = require('vscode');
     const root = process.env.TEXT_MARKER_SMOKE_DIR;
-    const report = value => fs.writeFileSync(path.join(root, 'stage.json'), JSON.stringify(value));
+    const report = value => {
+        const pending = path.join(root, 'stage.pending.json');
+        fs.writeFileSync(pending, JSON.stringify(value));
+        fs.renameSync(pending, path.join(root, 'stage.json'));
+    };
     const step = async name => {
         report({stage: name, language: vscode.env.language});
         await until(() => fs.existsSync(path.join(root, `${name}.continue`)), name);
@@ -43,6 +47,10 @@ exports.run = async () => {
         assert.ok(extension, 'Packaged extension is loaded');
         assert.equal(vscode.env.language, process.env.TEXT_MARKER_SMOKE_LOCALE, 'Actual VS Code display locale');
         await extension.activate();
+        if (process.env.TEXT_MARKER_SMOKE_TARGETED === '1') {
+            await runRuleNavigationHost(vscode, root, extension, report, step);
+            return;
+        }
         const commands = await vscode.commands.getCommands();
         for (let i = 1; i <= 30; i++) assert.ok(commands.includes(`textmarker.paletteColor${i}`));
         for (const color of colors) assert.ok(!commands.includes(`textmarker.highlight${color}`));
@@ -165,6 +173,138 @@ exports.run = async () => {
     }
 };
 
+async function runRuleNavigationHost(vscode, root, extension, report, step) {
+    const command = name => vscode.commands.executeCommand(`textmarker.${name}`);
+    const editor = await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(path.join(root, 'sample.txt')));
+    const settings = vscode.workspace.getConfiguration('textmarker');
+    await command('clearAllHighlight');
+    editor.selection = new vscode.Selection(2, 0, 2, 0);
+    await command('goToNextHighlight');
+    await command('goToPreviousHighlight');
+    assert.equal(editor.selection.start.line, 2, 'No rules and no selected text: navigation is a no-op');
+    const input = async name => {
+        report({stage: name, language: vscode.env.language});
+        await command('updateHighlight');
+        await until(() => fs.existsSync(path.join(root, name + '.continue')), name + ' renderer completion');
+    };
+    await step('targeted-ready');
+    await input('create-picker-cancel');
+    await input('create-input-cancel');
+    await input('create-literal');
+    editor.selection = new vscode.Selection(0, 0, 0, 11);
+    await command('goToNextHighlight');
+    assert.equal(editor.selection.start.character, 24, 'Literal array expression matches complete text');
+    await command('goToNextHighlight');
+    assert.equal(editor.selection.start.character, 0, 'Next wraps to first occurrence');
+    await command('goToPreviousHighlight');
+    assert.equal(editor.selection.start.character, 24, 'Previous wraps to last occurrence');
+    await command('goToPreviousHighlight');
+    assert.equal(editor.selection.start.character, 0, 'Previous navigates to preceding occurrence');
+    await step('created-navigation');
+    const save = async (name, expected) => {
+        report({stage: name, language: vscode.env.language});
+        await command('saveAllHighlights');
+        assert.deepEqual(vscode.workspace.getConfiguration('textmarker').get('savedHighlights'), expected);
+    };
+    const literal = {pattern: {type: 'string', expression: 'au8_data[0]', ignoreCase: true, wholeMatch: true}, color: '#00BCD4'};
+    await save('save-created', [literal]);
+    editor.selection = new vscode.Selection(0, 0, 0, 11);
+    await input('unique-edit-cancel');
+    await save('save-unchanged', [literal]);
+    editor.selection = new vscode.Selection(2, 0, 2, 0);
+    await input('create-regex');
+    const regex = {pattern: {type: 'regex', expression: 'au8_data\\[\\d+\\]', ignoreCase: false, wholeMatch: false}, color: '#5C8DFF'};
+    await save('save-created-regex', [literal, regex]);
+    assert.equal(vscode.workspace.getConfiguration('textmarker').get('enableIgnoreCase'), false);
+    assert.equal(vscode.workspace.getConfiguration('textmarker').get('enableWholeMatch'), false);
+    editor.selection = new vscode.Selection(2, 0, 2, 0);
+    await vscode.commands.executeCommand('editor.action.showContextMenu');
+    await step('navigation-menu');
+    // The renderer checks both switches have actual config consumers.
+    await settings.update('commandsOnContextMenu', {goToNextHighlight: false, goToPreviousHighlight: false}, vscode.ConfigurationTarget.Global);
+    await vscode.commands.executeCommand('editor.action.showContextMenu');
+    await step('navigation-hidden');
+    await settings.update('commandsOnContextMenu', undefined, vscode.ConfigurationTarget.Global);
+    await command('clearAllHighlight');
+    report({stage: 'complete', language: vscode.env.language, extension: extension.id, version: extension.packageJSON.version,
+        targeted: 'rule-navigation', creationAndCancellation: true, nextPreviousAndWrap: true, navigationVisibility: true, saved: [literal, regex]});
+}
+
+async function runRuleNavigationUI(cdp, root, locale, manifest, stage, release) {
+    const translations = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'package.nls.json' : `package.nls.${locale}.json`)));
+    const runtime = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'l10n/bundle.l10n.json' : `l10n/bundle.l10n.${locale}.json`)));
+    const visible = () => cdp.evaluate(`(() => {const e=document.querySelector('.quick-input-widget');return !!e && getComputedStyle(e).display!=='none';})()`);
+    const input = placeholder => until(async () => cdp.evaluate(`document.querySelector('.quick-input-widget input')?.getAttribute('placeholder')===${JSON.stringify(placeholder)}`), 'input: ' + placeholder);
+    const closed = () => until(async () => !await visible(), 'input closes');
+    const setInput = async text => {
+        await cdp.evaluate(`(() => {const e=document.querySelector('.quick-input-widget input');e.focus();e.select();})()`);
+        await cdp.call('Input.insertText', {text});
+    };
+    const modes = async (matchCase, regex, whole) => {
+        const expected = [runtime[matchCase ? 'Match case: On' : 'Match case: Off'], runtime[regex ? 'Regular expression: On' : 'Regular expression: Off'], runtime[whole ? 'Match whole words: On' : 'Match whole words: Off']];
+        await until(async () => cdp.evaluate(`(() => {const text=document.querySelector('.quick-input-widget').textContent;return ${JSON.stringify(expected)}.every(value=>text.includes(value));})()`), 'three mode states');
+    };
+    const clickMode = async icon => {
+        const before = await cdp.evaluate(`document.querySelector('.quick-input-message').textContent`);
+        const point = await cdp.evaluate(`(() => {const e=document.querySelector('.quick-input-widget .codicon-${icon}');const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()`);
+        await cdp.call('Input.dispatchMouseEvent', {type: 'mousePressed', button: 'left', clickCount: 1, ...point});
+        await cdp.call('Input.dispatchMouseEvent', {type: 'mouseReleased', button: 'left', clickCount: 1, ...point});
+        await until(async () => cdp.evaluate(`document.querySelector('.quick-input-message').textContent!==${JSON.stringify(before)}`), 'mode changed');
+    };
+    const picker = async name => {
+        await stage(name);
+        await input(runtime['Select a highlight to edit']);
+        const labels = await until(async () => cdp.evaluate(`(() => {const labels=[...document.querySelectorAll('.quick-input-list .monaco-list-row')].map(e=>e.querySelector('.label-name')?.textContent).filter(Boolean);return labels.length && labels;})()`), 'rule rows');
+        assert.equal(labels[0], runtime['Add rule'], 'First row creates a rule');
+        await cdp.screenshot(path.join(root, name + '-picker.png'));
+        return labels;
+    };
+    const accept = async () => {await cdp.evaluate(`document.querySelector('.quick-input-widget input').focus()`);await cdp.key('Enter', 'Enter', 13);await closed();};
+    const save = async name => {await stage(name);await input(locales[locale].save);await cdp.key('Enter', 'Enter', 13);};
+    await stage('targeted-ready');
+    await cdp.evaluate(`window.__textMarkerQuery = function query(selector, root=document) {const result=[...root.querySelectorAll(selector)];for(const e of root.querySelectorAll('*')) if(e.shadowRoot) result.push(...query(selector,e.shadowRoot));return result;};true`);
+    release('targeted-ready');
+    assert.equal((await picker('create-picker-cancel')).length, 1);
+    await cdp.key('Escape', 'Escape', 27);await closed();release('create-picker-cancel');
+    assert.equal((await picker('create-input-cancel')).length, 1);
+    await cdp.key('Enter', 'Enter', 13);await input(locales[locale].regex);
+    await setInput('discard me');await modes(true, true, false);await clickMode('case-sensitive');await clickMode('whole-word');await clickMode('regex');
+    await cdp.key('Escape', 'Escape', 27);await closed();release('create-input-cancel');
+    assert.equal((await picker('create-literal')).length, 1, 'Esc did not create any rule');
+    await cdp.key('Enter', 'Enter', 13);await input(locales[locale].regex);
+    await setInput('au8_data[0]');await modes(true, true, false);
+    await clickMode('regex');await clickMode('case-sensitive');await clickMode('whole-word');await modes(false, false, true);
+    await setInput('au8_data[0]');await cdp.screenshot(path.join(root, 'created-literal-input.png'));await accept();release('create-literal');
+    await stage('created-navigation');
+    const decorations = await until(async () => cdp.evaluate(`(() => {const values=[...document.querySelectorAll('.monaco-editor [class*="TextEditorDecorationType"]')].map(e=>({text:e.textContent,color:getComputedStyle(e).backgroundColor}));return values.some(e=>e.color==='rgba(0, 188, 212, 0.25)') && values;})()`), 'real literal decoration');
+    fs.writeFileSync(path.join(root, 'created-decorations.json'), JSON.stringify(decorations, null, 2));
+    await cdp.screenshot(path.join(root, 'created-navigation.png'));release('created-navigation');await save('save-created');
+    await stage('unique-edit-cancel');await input(locales[locale].regex);await modes(false, false, true);
+    assert.equal(await cdp.evaluate(`document.querySelector('.quick-input-widget input').value`), 'au8_data[0]', 'Unique match opens directly');
+    await setInput('discard existing edit');await cdp.key('Escape', 'Escape', 27);await closed();release('unique-edit-cancel');await save('save-unchanged');
+    assert.equal((await picker('create-regex')).length, 2, 'Creation remains first when existing rules are listed');
+    await cdp.key('Enter', 'Enter', 13);await input(locales[locale].regex);
+    await setInput('x');await modes(true, true, false);
+    await setInput('[');
+    await until(async () => cdp.evaluate(`document.querySelector('.quick-input-widget').textContent.includes(${JSON.stringify(runtime['Invalid regular expression. Check brackets, escapes and quantifiers.'])})`), 'invalid regex feedback');
+    await cdp.key('Enter', 'Enter', 13);assert.ok(await visible(), 'Invalid regex blocks creation');
+    await cdp.screenshot(path.join(root, 'create-invalid-regex.png'));
+    await setInput('au8_data\\[\\d+\\]');await accept();release('create-regex');await save('save-created-regex');
+    await stage('navigation-menu');
+    const navigation = ['goToNextHighlight', 'goToPreviousHighlight'].map(name=>translations['command.'+name]);
+    const labels = await until(async () => cdp.evaluate(`(() => {const labels=window.__textMarkerQuery('.context-view .action-label').map(e=>e.textContent);return ${JSON.stringify(navigation)}.every(label=>labels.includes(label)) && labels;})()`), 'localized next/previous menu labels');
+    assert.equal(manifest.contributes.menus['editor/context'].length, 6);
+    assert.ok(labels.includes(translations['menu.setHighlight']));
+    for (const name of ['updateHighlight','unhighlight','clearAllHighlight']) assert.ok(labels.includes(translations['command.'+name]));
+    fs.writeFileSync(path.join(root, 'navigation-menu-labels.json'), JSON.stringify(labels, null, 2));await cdp.screenshot(path.join(root, 'navigation-menu.png'));
+    await cdp.key('Escape', 'Escape', 27);release('navigation-menu');
+    await stage('navigation-hidden');
+    await until(async () => cdp.evaluate(`window.__textMarkerQuery('.context-view .action-label').some(e=>e.textContent===${JSON.stringify(translations['command.clearAllHighlight'])})`), 'remaining context commands');
+    const hiddenLabels = await cdp.evaluate(`window.__textMarkerQuery('.context-view .action-label').map(e=>e.textContent)`);
+    for(const label of navigation) assert.ok(!hiddenLabels.includes(label), 'Visibility setting hides '+label);
+    await cdp.key('Escape', 'Escape', 27);release('navigation-hidden');
+}
+
 class DevTools {
     constructor(url) {
         this.socket = new WebSocket(url);
@@ -199,7 +339,7 @@ class DevTools {
 }
 
 async function main() {
-    const [vsix, codeExe, locale = 'en'] = process.argv.slice(2);
+    const [vsix, codeExe, locale = 'en', mode = 'full'] = process.argv.slice(2);
     assert.ok(vsix && codeExe, 'Usage: node scripts/host-smoke.cjs package.vsix path/to/Code.exe [en|zh-cn|zh-tw]');
     assert.ok(locales[locale], `Unsupported test locale: ${locale}`);
     const manifest = require(path.resolve(__dirname, '..', 'package.json'));
@@ -209,6 +349,10 @@ async function main() {
     const inheritedSettings = {...recommended, 'textmarker.savedHighlights': [{
         pattern: {type: 'string', expression: 'legacy_marker', ignoreCase: false, wholeMatch: true}, color: '#C0FFEE'
     }]};
+    if (mode === 'rule-navigation') {
+        delete inheritedSettings['textmarker.commandsOnContextMenu'].goToNextHighlight;
+        delete inheritedSettings['textmarker.commandsOnContextMenu'].goToPreviousHighlight;
+    }
     const root = path.resolve(__dirname, '..', '__host-smoke', new Date().toISOString().replace(/[:.]/g, '-') + '-' + locale);
     assert.ok(!fs.existsSync(root), `Evidence already exists: ${root}. Preserve it and use a fresh test directory.`);
     fs.mkdirSync(path.join(root, 'user', 'User'), {recursive: true});
@@ -223,7 +367,7 @@ async function main() {
         'window.restoreWindows': 'none', 'update.mode': 'none', 'extensions.autoCheckUpdates': false,
         'extensions.autoUpdate': false, 'window.menuStyle': 'custom', 'editor.minimap.enabled': false, 'editor.fontSize': 22
     }));
-    const environment = {...process.env, TEXT_MARKER_SMOKE_DIR: root, TEXT_MARKER_SMOKE_LOCALE: locale};
+    const environment = {...process.env, TEXT_MARKER_SMOKE_DIR: root, TEXT_MARKER_SMOKE_LOCALE: locale, TEXT_MARKER_SMOKE_TARGETED: mode === 'rule-navigation' ? '1' : '0'};
     delete environment.ELECTRON_RUN_AS_NODE;
     const install = spawnSync(codeExe, [path.join(path.dirname(codeExe), 'resources', 'app', 'out', 'cli.js'), '--user-data-dir', path.join(root, 'user'), '--extensions-dir', extensions, '--install-extension', path.resolve(vsix), '--force'], {encoding: 'utf8', env: {...environment, ELECTRON_RUN_AS_NODE: '1'}, windowsHide: true});
     // Code.exe needs the official CLI entrypoint when ELECTRON_RUN_AS_NODE is set.
@@ -266,6 +410,20 @@ async function main() {
     }, name);
     const release = name => fs.writeFileSync(path.join(root, `${name}.continue`), '');
     const expected = locales[locale];
+    if (mode === 'rule-navigation') {
+        try {
+            await runRuleNavigationUI(cdp, root, locale, manifest, stage, release);
+            const result = await stage('complete');
+            assert.equal(await completion, 0, 'Targeted real host exit');
+            console.log(JSON.stringify({status: 'passed', locale, evidence: root, ...result}, null, 2));
+        } finally {
+            if (!exited && cdp.socket.readyState === WebSocket.OPEN) {
+                cdp.socket.send(JSON.stringify({id: ++cdp.sequence, method: 'Browser.close'}));
+            }
+            cdp.socket.close();
+        }
+        return;
+    }
     await stage('cycle-0');
     await cdp.evaluate(`window.__textMarkerQuery = function query(selector, root = document) {const result = [...root.querySelectorAll(selector)];for (const element of root.querySelectorAll('*')) {if (element.shadowRoot) result.push(...query(selector, element.shadowRoot));}return result;}; true`);
     console.log('Real host assertions passed; checking rendered UI: ' + root);
@@ -315,8 +473,8 @@ async function main() {
     const translations = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', locale === 'en' ? 'package.nls.json' : `package.nls.${locale}.json`)));
     const renderedLabels = await cdp.evaluate(`window.__textMarkerQuery('.context-view .action-label').map(e=>e.textContent)`);
     assert.ok(!renderedLabels.includes(translations['command.toggleHighlight']), 'Cycle command stays out of the context submenu');
-    assert.equal(manifest.contributes.menus['editor/context'].length, 4);
-    for (const command of ['updateHighlight', 'unhighlight', 'clearAllHighlight']) assert.ok(renderedLabels.includes(translations['command.' + command]));
+    assert.equal(manifest.contributes.menus['editor/context'].length, 6);
+    for (const command of ['updateHighlight', 'unhighlight', 'clearAllHighlight', 'goToNextHighlight', 'goToPreviousHighlight']) assert.ok(renderedLabels.includes(translations['command.' + command]));
     for (const command of expectedColors) {const entry = manifest.contributes.commands.find(item=>item.command === command);assert.ok(renderedLabels.includes(translations[entry.title.slice(1,-1)]), 'Rendered color menu: ' + command);}
     const labels = await cdp.evaluate(`JSON.stringify([...window.__textMarkerQuery('.context-view .action-label')].map(e=>e.textContent))`);
     fs.writeFileSync(path.join(root, 'menu-labels.json'), labels);

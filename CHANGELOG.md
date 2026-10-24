@@ -5,6 +5,12 @@ All notable changes to "Text Marker Custom" extension will be documented in this
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.14.1] - 2026-10-25
+
+- Fixed creation from Edit Highlight Rules when no rules exist. The edit picker previously only accepted existing rules and showed a no-highlights message; its first row now offers Add rule and opens the existing three-button input. Unique matches still open directly. Enter commits, Esc leaves rules and color allocation untouched.
+- Restored the existing next/previous same-highlight commands to the context menu, their configuration schema and default visibility, keeping the original cyclic navigation behavior. Updated English, Simplified Chinese and Traditional Chinese entry points and bilingual setup documentation.
+- Validation: compile, lint and unit/acceptance tests; targeted real VS Code 1.108.2 host checks for creation, cancellation, all three input switches, invalid regex, navigation and localized menu labels. Host checks use isolated profiles; no RF/device testing or older VS Code runtime certification is implied.
+
 ## [1.14.0] - 2026-10-25
 ### Added
 

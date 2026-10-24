@@ -1,8 +1,8 @@
 # Text Marker Custom
 
-简体中文 | [English](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/README.en.md)
+简体中文 | [English](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.1/README.en.md)
 
-![Text Marker Custom](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/text-marker-custom.png)
+![Text Marker Custom](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.1/images/text-marker-custom.png)
 
 可配置色板的文本高亮, 可调边框和圆角, 支持英文与简繁中文界面. 选中 `au8_data[0]` 等文本即可高亮完整匹配项, 也可以使用正则表达式.
 
@@ -12,7 +12,7 @@
 
 ## 安装与原版迁移
 
-需要 VS Code 1.73 或更高版本. 可从 [GitHub Release](https://github.com/luck-gh/vscode-text-marker/releases/tag/v1.14.0) 下载 VSIX, 执行 `Extensions: Install from VSIX...` 安装. Marketplace 发布后也可按 ID `luck-gh.text-marker-custom` 查找安装.
+需要 VS Code 1.73 或更高版本. 可从 [GitHub Release](https://github.com/luck-gh/vscode-text-marker/releases/tag/v1.14.1) 下载 VSIX, 执行 `Extensions: Install from VSIX...` 安装. Marketplace 发布后也可按 ID `luck-gh.text-marker-custom` 查找安装.
 
 切换前先禁用或卸载原版 `ryu1kn.text-marker`. 两个版本沿用同一套 `textmarker.*` 命令和设置, 不能同时启用. 已保存的高亮规则, 个人调色板和自定义快捷键继续使用原标识符. 安装不会重写用户配置; 旧版仍在运行的窗口需要执行 `Developer: Reload Window`.
 
@@ -22,11 +22,11 @@
 - 选中文本, 悬停右键“设置高亮”打开原生二级菜单, 直接选择“颜色1”, “颜色2”等. 菜单按 `textmarker.highlightColors` 的数量和顺序显示前 30 项, 选第 N 项即使用当前配置的第 N 个颜色; 修改配置后立即生效, 不需重装或重载. 名称为固定序号, 不显示动态色名. 空色板隐藏该子菜单.
 - 在已有高亮上重新选色可直接换色, 保留原正则表达式和大小写, 整词匹配选项.
 - 修改边框, 圆角或背景不透明度后, 已有高亮立即刷新.
-- 点击“编辑高亮规则”直接在同一输入框中编辑普通文本或正则. 右上角 `Aa` 切换区分大小写, `Ab|` 切换全字匹配, `.*` 切换正则; 输入框下方实时显示三项开关状态. 打开时沿用该规则的模式, Enter 应用, Esc 放弃; 无效正则会在框内提示并阻止应用. 匹配选项只作用于当前规则, 颜色保持不变, 不改变全局默认模式. 当前光标或选区无法唯一确定规则时, 先选择要编辑的规则.
+- 点击“编辑高亮规则”直接在同一输入框中编辑普通文本或正则. 右上角 `Aa` 切换区分大小写, `Ab|` 切换全字匹配, `.*` 切换正则; 输入框下方实时显示三项开关状态. 打开时沿用该规则的模式, Enter 应用, Esc 放弃; 无效正则会在框内提示并阻止应用. 匹配选项只作用于当前规则, 颜色保持不变, 不改变全局默认模式. 当前光标或选区无法唯一确定规则时, 先选择要编辑的规则, 列表首行为“增加规则”. 即使尚无高亮也可以从这里创建: 默认开启正则并沿用全局大小写/整词模式, 可切换为普通文本输入 `au8_data[0]`; Enter 才创建并分配颜色, Esc 不修改规则或占用颜色.
 - “正则高亮”命令也使用这个输入框, 默认开启正则, 可直接切换为普通文本. 使用命令面板清除或保存全部高亮.
-- 状态栏可切换大小写与整词匹配模式. 下一个或上一个相同高亮命令可通过命令面板调用.
+- 状态栏可切换大小写与整词匹配模式. 右键“跳转到下一个相同高亮”或“跳转到上一个相同高亮”沿当前规则循环跳转, 命令面板也可调用. 无规则且无选中文本时不执行操作; 有选中文本时沿用原有创建高亮并跳转行为.
 
-右键仅保留“设置高亮”, “编辑高亮规则”, “取消指定高亮”, “清除全部高亮”四种入口, 各自可通过下方四个显示开关隐藏. 右键颜色菜单最多 30 项; 更多颜色仍参与 Ctrl+H 循环和自动分配. 原固定十色色名命令已由配置驱动的序号菜单替代.
+右键提供“设置高亮”, “编辑高亮规则”, “取消指定高亮”, “清除全部高亮”, “跳转到下一个相同高亮”, “跳转到上一个相同高亮”六种入口, 默认全部显示, 可通过下方对应开关隐藏. 右键颜色菜单最多 30 项; 更多颜色仍参与 Ctrl+H 循环和自动分配. 原固定十色色名命令已由配置驱动的序号菜单替代.
 
 当前 VS Code 1.108 的原生扩展 API 将按钮放在输入框上方标题栏的右侧, 与 Ctrl+F 输入行内按钮的位置不同. 开关状态以输入框下方文字为准.
 
@@ -74,7 +74,9 @@
         "toggleHighlight": true,            // 显示设置高亮子菜单, 按当前色板顺序显示前 30 项, 悬停后直接选颜色.
         "unhighlight": true,                // 显示取消指定高亮, 为移除某一条规则提供独立入口.
         "clearAllHighlight": true,          // 显示清除全部高亮, 切换阅读任务时可以一次清空当前规则.
-        "updateHighlight": true             // 显示编辑高亮规则, 直接调整表达式, 大小写, 全字与正则开关; 颜色通过设置高亮选择.
+        "updateHighlight": true,            // 显示编辑高亮规则, 直接调整表达式, 大小写, 全字与正则开关; 颜色通过设置高亮选择.
+        "goToNextHighlight": true,           // 显示下一个相同高亮, 沿当前规则循环定位后续匹配, 便于阅读同一变量.
+        "goToPreviousHighlight": true        // 显示上一个相同高亮, 反向循环定位以便返回前一处.
     }
 }
 ```
@@ -107,21 +109,21 @@
 
 第一张动图中的旧切换命令会在第二次调用时移除高亮. 从 1.13.0 起, **切换高亮颜色** 执行添加或循环换色; 取消请使用 **取消高亮** (推荐 Ctrl+Alt+H). 原动图也未展示当前配置驱动的序号颜色子菜单与样式.
 
-![原作者演示: 高亮与取消高亮](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/animations/public.gif)
+![原作者演示: 高亮与取消高亮](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.1/images/animations/public.gif)
 
 大小写与整词匹配:
 
-![原作者演示: 匹配模式](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/animations/ignore-case-and-whole-match.gif)
+![原作者演示: 匹配模式](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.1/images/animations/ignore-case-and-whole-match.gif)
 
 编辑已有规则:
 
 此原版动图中的独立操作选择步骤已在 1.14.0 删除; 当前直接打开带 `Aa` / `Ab|` / `.*` 按钮的规则输入框.
 
-![原作者演示: 编辑高亮规则](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.0/images/animations/update-highlight.gif)
+![原作者演示: 编辑高亮规则](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.1/images/animations/update-highlight.gif)
 
 ## 开发, 反馈与许可
 
 - [提交问题](https://github.com/luck-gh/vscode-text-marker/issues).
-- [构建与测试说明](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/CONTRIBUTING.md), 包含编译, 模拟测试和隔离的三语真实宿主验收.
-- [更新记录](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/CHANGELOG.md).
-- [MIT 许可证](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/LICENSE.txt), 保留 `Copyright (c) 2016 Ryuichi Inagaki`.
+- [构建与测试说明](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.1/CONTRIBUTING.md), 包含编译, 模拟测试和隔离的三语真实宿主验收.
+- [更新记录](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.1/CHANGELOG.md).
+- [MIT 许可证](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.1/LICENSE.txt), 保留 `Copyright (c) 2016 Ryuichi Inagaki`.

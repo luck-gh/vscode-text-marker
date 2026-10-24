@@ -2,14 +2,14 @@
   "name": "text-marker-custom",
   "displayName": "Text Marker Custom",
   "description": "%extension.description%",
-  "version": "1.14.0",
+  "version": "1.14.1",
   "publisher": "luck-gh",
   "license": "SEE LICENSE IN LICENSE.txt",
   "icon": "images/text-marker-custom.png",
   "bugs": {
     "url": "https://github.com/luck-gh/vscode-text-marker/issues"
   },
-  "homepage": "https://github.com/luck-gh/vscode-text-marker/blob/v1.14.0/README.md",
+  "homepage": "https://github.com/luck-gh/vscode-text-marker/blob/v1.14.1/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/luck-gh/vscode-text-marker.git"
@@ -118,13 +118,21 @@
             },
             "updateHighlight": {
               "type": "boolean"
+            },
+            "goToNextHighlight": {
+              "type": "boolean"
+            },
+            "goToPreviousHighlight": {
+              "type": "boolean"
             }
           },
           "default": {
             "toggleHighlight": true,
             "unhighlight": true,
             "clearAllHighlight": true,
-            "updateHighlight": true
+            "updateHighlight": true,
+            "goToNextHighlight": true,
+            "goToPreviousHighlight": true
           },
           "additionalProperties": false
         },
@@ -466,6 +474,16 @@
           "submenu": "textmarker.highlightColours",
           "group": "2_textmarker@0",
           "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.toggleHighlight && textmarker.hasPaletteColors"
+        },
+        {
+          "command": "textmarker.goToNextHighlight",
+          "group": "2_textmarker@4",
+          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.goToNextHighlight"
+        },
+        {
+          "command": "textmarker.goToPreviousHighlight",
+          "group": "2_textmarker@5",
+          "when": "editorTextFocus && config.textmarker.commandsOnContextMenu.goToPreviousHighlight"
         }
       ],
       "textmarker.highlightColours": [

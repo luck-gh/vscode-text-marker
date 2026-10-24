@@ -51,7 +51,7 @@ Menu and setting translations live in `package.nls*.json`; runtime translations 
 Keep English, Simplified Chinese and Traditional Chinese keys in sync. Use `vscode.l10n.t` in runtime code.
 Configuration keys and command identifiers must remain language-independent.
 
-Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn --githubBranch v1.14.0` after validation. The explicit release tag keeps relative Marketplace links off the unchanged default branch.
+Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn --githubBranch v1.14.1` after validation. The explicit release tag keeps relative Marketplace links off the unchanged default branch.
 The independently branded package is `luck-gh.text-marker-custom`. Keep the `textmarker.*` configuration and command namespace stable. The original SVG icon source is `images/text-marker-custom.svg`; the Marketplace icon is its 256x256 PNG export.
 
 ## Real VS Code smoke test
@@ -65,6 +65,15 @@ changes including zero, localized rule and save prompts, regex preservation afte
 Screenshots, renderer styles, menu labels and the actual saved rule remain under ignored
 `__host-smoke/`; failed runs are preserved. The test closes its own window automatically.
 Personal VS Code profiles, settings and windows are not used by this test.
+
+For the 1.14.1 creation/navigation fix, append `rule-navigation` after the locale to run only the targeted path:
+`node scripts/host-smoke.cjs <package.vsix> <path-to-Code-executable> <locale> rule-navigation`.
+This mode checks the first Add rule entry with zero/existing rules, picker and input cancellation,
+literal array text creation with all three switches, saved modes/color allocation, unique direct editing,
+invalid-regex rejection, both navigation directions including wraparound and no-rule behavior,
+and the six localized context entries with default navigation visibility and functioning hide settings.
+It uses the same isolated installer, language-pack bootstrap and renderer capture as the full mode.
+
 
 The packaged extension is validated with this smoke test on Windows VS Code 1.108.2 in English, Simplified Chinese and Traditional Chinese. Installing a language pack through the CLI does not immediately generate
 `languagepacks.json`: the first workbench scan creates it after early startup locale resolution.

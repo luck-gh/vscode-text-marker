@@ -30,5 +30,6 @@
   "Match whole words: Off": "全字匹配: 关",
   "Match whole words: On (click to turn off)": "全字匹配: 开 (点击关闭)",
   "Match whole words: Off (click to turn on)": "全字匹配: 关 (点击开启)",
-  "This palette color is no longer available. Check textmarker.highlightColors.": "该色板颜色已不可用, 请检查 textmarker.highlightColors."
+  "This palette color is no longer available. Check textmarker.highlightColors.": "该色板颜色已不可用, 请检查 textmarker.highlightColors.",
+  "Add rule": "增加规则"
 }

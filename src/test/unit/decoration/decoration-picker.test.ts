@@ -41,6 +41,23 @@ suite('DecorationPicker', () => {
         pattern: patternFactory.create({phrase: 'TEXT_5', wholeMatch: true})
     });
 
+    for (const decorations of [[], [decoration1, decoration2]]) {
+        test(`offers Add rule first when editing with ${decorations.length} rules`, async () => {
+            let labels: string[] = [];
+            const windowComponent = mockType<WindowComponent>({showQuickPick: (items: any[]) => {
+                labels = items.map(item => item.label);
+                return task.of(some(items[0]));
+            }});
+            const picker = new DecorationPicker(mockType<DecorationRegistry>({retrieveAll: () => decorations}), windowComponent);
+            assert.deepEqual(await picker.pickForEdit('Edit')(), some('create'));
+            assert.deepEqual(labels, ['Add rule', ...decorations.map(decoration => decoration.pattern.displayText)]);
+        });
+    }
+    test('cancels the edit picker without choosing a rule or creation', async () => {
+        const picker = new DecorationPicker(mockType<DecorationRegistry>({retrieveAll: () => []}),
+            mockType<WindowComponent>({showQuickPick: () => task.of(none)}));
+        assert.deepEqual(await picker.pickForEdit('Edit')(), none);
+    });
     test('it lets user to pick a highlight pattern', async () => {
         const windowComponent = mock(WindowComponent);
         when(windowComponent.showQuickPick(

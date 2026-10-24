@@ -28,6 +28,17 @@ export default class DecorationPicker {
             map(_v => O.none)(this.showNoItemMessage());
     }
 
+    pickForEdit(placeHolderText: string): Task<O.Option<Decoration | 'create'>> {
+        const items: (QuickPickItem & {decoration: Decoration | 'create'})[] = [
+            {label: l10n.t('Add rule'), decoration: 'create'},
+            ...this.buildQuickPickItems(this.decorationRegistry.retrieveAll())
+        ];
+        return getOptionM(task).map(
+            this.windowComponent.showQuickPick(items, {placeHolder: placeHolderText}),
+            item => item.decoration
+        );
+    }
+
     private showPicker(decorations: Decoration[], placeHolderText: string): Task<O.Option<Decoration>> {
         const selectItems = this.buildQuickPickItems(decorations);
         const options = {placeHolder: placeHolderText};

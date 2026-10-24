@@ -8,6 +8,7 @@ import DecorationRegistry from './decoration/decoration-registry';
 import DecorationPicker from './decoration/decoration-picker';
 import HighlightUsingRegexCommand from './commands/highlight-using-regex';
 import MatchingModeRegistry from './matching-mode-registry';
+import PatternFactory from './pattern/pattern-factory';
 import PatternReader from './pattern-reader';
 import RemoveAllHighlightsCommand from './commands/remove-all-highlights';
 import SaveAllHighlightsCommand from './commands/save-all-highlights';
@@ -107,7 +108,8 @@ export default class CommandFactory {
             this.getDecorationRegistry(),
             new PatternReader(this.getWindowComponent()),
             this.getTextLocationRegistry(),
-            this.getDecorationPicker()
+            this.getDecorationPicker(),
+            new PatternFactory(this.getMatchingModeRegistry())
         );
     }
 

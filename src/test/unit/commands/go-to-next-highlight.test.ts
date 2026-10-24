@@ -34,6 +34,14 @@ suite('Go-to-next-highlight command', function () {
     const decorationTypeRegistry = mock(DecorationTypeRegistry);
     when(decorationTypeRegistry.provideFor(any())).thenReturn(decorationType);
 
+    test('leaves an empty editor without rules unchanged', () => {
+        const editor = mockType<TextEditor>({id: 'empty-editor', selectedText: '', selection: {start: 0, end: 0}});
+        const command = new GoToNextHighlightCommand(matchingModeRegistry, new TextLocationRegistry(), decorationRegistry,
+            decorationTypeRegistry, mockType<WindowComponent>({visibleTextEditors: [editor]}));
+        command.execute(editor);
+        assert.deepEqual(editor.selection, {start: 0, end: 0});
+    });
+
     suite('when the cursor is on a highlight and not the last one of the same pattern', () => {
 
         const editor = mockType<TextEditor>({id: 'EDITOR_ID', selection: {start: 31, end: 31}});
