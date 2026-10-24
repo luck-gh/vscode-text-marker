@@ -52,7 +52,7 @@ Keep English, Simplified Chinese and Traditional Chinese keys in sync. Use `vsco
 Configuration keys and command identifiers must remain language-independent.
 
 Package with `npm exec --yes --package=@vscode/vsce@4.0.0 -- vsce package --no-yarn` after validation.
-The VSIX is for local testing until the publisher identity and distribution plan are confirmed.
+GitHub custom VSIX builds retain the original extension ID. Independently publishing on the Marketplace requires a separate, verified publisher identity.
 
 ## Real VS Code smoke test
 

@@ -5,6 +5,18 @@ All notable changes to "Text Marker (Highlighter)" extension will be documented 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.11.1] - 2026-10-24 (custom fork)
+### Added
+- Ten fixed context-menu highlight colors, preserving existing pattern options when recoloring.
+- Configurable border width, style and corner radius, with immediate style refresh.
+- Native English, Simplified Chinese and Traditional Chinese menus and runtime prompts.
+- Isolated real-host and renderer smoke tests for all three display languages.
+
+### Changed
+- Require VS Code 1.73 or later.
+- Remove extension telemetry and automatic post-publish Git tag/push actions.
+- Retain the original extension ID for GitHub custom builds so existing settings and keybindings continue to work.
+
 ## [1.11.0] - 2019-04-20
 ### Added
 - Configuration to hide status bar items. [#32](https://github.com/ryu1kn/vscode-text-marker/issues/32)

@@ -4,9 +4,6 @@ import AppIntegrator from '../../../lib/app-integrator';
 import {createFakeEditor} from '../helpers/fake-editor';
 import {createFakeVsCode, EXECUTION_CONTEXT, decorationTypes} from '../helpers/fake-vscode';
 import {Position, Range} from 'vscode';
-import {getVsTelemetryReporterCreator} from '../../../lib/telemetry/vscode-telemetry-reporter';
-import {join} from 'path';
-import {TelemetryReporterLocator} from '../../../lib/telemetry/telemetry-reporter-locator';
 
 suite('Highlight command', () => {
 
@@ -15,14 +12,12 @@ suite('Highlight command', () => {
     let editor3: any;
     let command: any;
     let fakeVscode: any;
-    const packageJsonPath = join(__dirname, '..', '..', '..', '..', 'package.json');
 
     setup(() => {
         editor1 = createFakeEditor({wholeText: 'A TEXT B TEXT C', selectedText: 'TEXT'});
         editor2 = createFakeEditor({wholeText: 'a TEXT'});
         editor3 = createFakeEditor({wholeText: 'a TEXT', selectedText: 'TEX'});
         fakeVscode = createFakeVsCode({editors: [editor1, editor2, editor3]});
-        TelemetryReporterLocator.load(packageJsonPath, getVsTelemetryReporterCreator(false));
 
         AppIntegrator.create(fakeVscode, console).integrate(EXECUTION_CONTEXT);
 

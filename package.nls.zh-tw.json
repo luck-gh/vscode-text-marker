@@ -35,7 +35,6 @@
   "setting.delayForRefreshingHighlight": "編輯後更新醒目提示的等待時間, 單位毫秒; null 表示不更新.",
   "setting.commandsOnContextMenu": "選擇在編輯器快顯功能表中顯示的命令.",
   "setting.savedHighlights": "開啟編輯器時還原的已儲存醒目提示.",
-  "setting.enableTelemetry": "允許收集擴充功能使用資料.",
   "setting.borderWidth": "醒目提示框線寬度, 單位 px; 0 為關閉框線.",
   "setting.borderStyle": "醒目提示框線樣式, 框線色彩跟隨醒目提示色彩.",
   "setting.borderRadius": "醒目提示圓角半徑, 單位 px; 0 為直角, 999 為膠囊形.",

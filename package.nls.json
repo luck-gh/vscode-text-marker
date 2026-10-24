@@ -35,7 +35,6 @@
   "setting.delayForRefreshingHighlight": "Delay in milliseconds before refreshing highlights after edits. Set to null to disable refresh.",
   "setting.commandsOnContextMenu": "Choose which commands appear on the editor context menu.",
   "setting.savedHighlights": "Saved highlights to restore when opening an editor.",
-  "setting.enableTelemetry": "Allow extension usage data to be collected.",
   "setting.borderWidth": "Highlight border width in pixels. Set to 0 to hide the border.",
   "setting.borderStyle": "Highlight border style. The border uses the highlight color.",
   "setting.borderRadius": "Highlight corner radius in pixels. Use 0 for square corners or 999 for a pill shape.",

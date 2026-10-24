@@ -11,8 +11,6 @@ import WindowComponent from '../../lib/vscode/window';
 import DecorationVariationReader from '../../lib/decoration/decoration-variation-reader';
 import {Decoration} from '../../lib/entities/decoration';
 import PatternFactory from '../../lib/pattern/pattern-factory';
-import {TelemetryReporterLocator} from '../../lib/telemetry/telemetry-reporter-locator';
-import {getVsTelemetryReporterCreator} from '../../lib/telemetry/vscode-telemetry-reporter';
 import {mockType} from '../helpers/mock';
 
 const root = path.resolve(__dirname, '../../..');
@@ -73,7 +71,6 @@ suite('Localization resources', () => {
             assert.equal(input.placeHolder, regexTitle);
             assert.equal(input.validateInput('au8_data\\[\\d+\\]'), undefined);
             for (const value of ['[', '(', '\\', 'a{2,1}']) assert.ok(input.validateInput(value).startsWith(errorText));
-            TelemetryReporterLocator.load(path.join(root, 'package.json'), getVsTelemetryReporterCreator(false));
             const decoration = new Decoration('test', new PatternFactory(modes).create({phrase: 'au8_data[0]'}), '#00BCD4');
             await new DecorationVariationReader(window).read(decoration)();
             assert.equal(labels.length, 4);

@@ -35,7 +35,6 @@
   "setting.delayForRefreshingHighlight": "编辑后刷新高亮的等待时间, 单位毫秒; null 表示不刷新.",
   "setting.commandsOnContextMenu": "选择在编辑器右键菜单中显示的命令.",
   "setting.savedHighlights": "打开编辑器时恢复的已保存高亮.",
-  "setting.enableTelemetry": "允许收集插件使用数据.",
   "setting.borderWidth": "高亮边框宽度, 单位 px; 0 为关闭边框.",
   "setting.borderStyle": "高亮边框样式, 边框颜色跟随高亮颜色.",
   "setting.borderRadius": "高亮圆角半径, 单位 px; 0 为直角, 999 为胶囊形.",

@@ -139,7 +139,7 @@ async function main() {
     fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(manifest));
     fs.writeFileSync(path.join(root, 'sample.txt'), 'au8_data[0] au8_data[1] au8_data[0] au8_data[0\n');
     fs.writeFileSync(path.join(root, 'user', 'User', 'settings.json'), JSON.stringify({
-        'telemetry.telemetryLevel': 'off', 'textmarker.enableTelemetry': false,
+        'telemetry.telemetryLevel': 'off',
         'textmarker.borderWidth': 1, 'textmarker.borderStyle': 'solid', 'textmarker.borderRadius': 999,
         'textmarker.defaultHighlightOpacity': 0.7, 'workbench.startupEditor': 'none',
         'window.restoreWindows': 'none', 'update.mode': 'none', 'extensions.autoCheckUpdates': false,

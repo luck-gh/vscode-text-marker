@@ -18,8 +18,14 @@ The context submenu contains ten fixed color presets. Automatic color allocation
 uses `textmarker.highlightColors`. User keybindings and personal colors remain in VS Code settings.
 Language follows VS Code's display language after restart; unsupported languages use English.
 Requires VS Code 1.73 or later. See [CONTRIBUTING.md](CONTRIBUTING.md) for building and testing.
-Local builds retain the original extension ID and replace an installed Text Marker.
-Use a separate publisher identity before publishing this fork as a new Marketplace extension.
+GitHub custom VSIX builds retain the original `ryu1kn.text-marker` extension ID and replace
+an installed Text Marker. This is a custom build from the luck-gh fork, not an upstream release.
+Only one Text Marker build should be enabled. Existing `textmarker.*` settings, saved rules
+and custom keybindings continue to use the same identifiers; installation does not rewrite them.
+An independently published Marketplace edition requires a separate, verified publisher identity.
+
+This fork does not collect extension usage telemetry. The upstream telemetry integration and
+its dependency have been removed.
 
 
 ## Features
@@ -49,7 +55,7 @@ You can update a highlight rule after you set it.
 
 ## Request Features or Report Bugs
 
-Feature requests and bug reports are very welcome: https://github.com/ryu1kn/vscode-text-marker/issues
+Feature requests and bug reports are very welcome: https://github.com/luck-gh/vscode-text-marker/issues
 
 A couple of requests from me when you raise an github issue.
 
@@ -214,12 +220,6 @@ A couple of requests from me when you raise an github issue.
     ]
     ```
 
-* `textmarker.enableTelemetry` (default: `true`)
-
-    Allow the extension usage data to be sent to the extension author.
-
-    Text Marker sends usage data only when both `textmarker.enableTelemetry` and `telemetry.enableTelemetry` are set to `true`.
-
 ## Keyboard Shortcuts
 
 You can quickly invoke the above TextMarker commands by registering them to your keyboard shortcut settings. For example:
@@ -228,17 +228,9 @@ You can quickly invoke the above TextMarker commands by registering them to your
   { "key": "ctrl+h", "command": "textmarker.toggleHighlight", "when": "editorTextFocus" }
 ```
 
-## Telemetry
-
-Text Marker collects usage data and send it to the extension author to help improve the extension.
-If you don't want usage data to be collected, you can set the `textmarker.enableTelemetry` setting to `false`.
-
-If you're setting VS Code's `telemetry.enableTelemetry` setting to `false`,
-regardless of the value of `textmarker.enableTelemetry`, Text Marker will not collect usage data.
-
 ## Changelog
 
-* https://github.com/ryu1kn/vscode-text-marker/blob/master/CHANGELOG.md
+* [CHANGELOG.md](CHANGELOG.md)
 
 ## How to contribute
 

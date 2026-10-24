@@ -29,7 +29,7 @@ import AutoRefreshDecoration from './commands/auto-refresh-decoration';
 import AutoRefreshDecorationWithDelay from './commands/auto-refresh-decoration-with-delay';
 import {GoToNextHighlightCommand} from './commands/go-to-next-highlight';
 import {GoToPreviousHighlightCommand} from './commands/go-to-previous-highlight';
-import {AutoTriggerCommand} from './commands/command';
+import CommandWrapper from './commands/command';
 import {DecorationTypeRegistry} from './decoration/decoration-type-registry';
 
 const generateUuid = require('uuid/v4');
@@ -128,7 +128,7 @@ export default class CommandFactory {
     }
 
     private _wrapCommand(command: CommandLike) {
-        return new AutoTriggerCommand(command, this.logger);
+        return new CommandWrapper(command, this.logger);
     }
 
     createSavedHighlightsRestorer() {

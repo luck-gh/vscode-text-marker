@@ -2,8 +2,6 @@ import {l10n} from 'vscode';
 import WindowComponent, {QuickPickItem} from '../vscode/window';
 import {Option, some} from 'fp-ts/lib/Option';
 import {Decoration} from '../entities/decoration';
-import {TelemetryReporterLocator} from '../telemetry/telemetry-reporter-locator';
-import {TelemetryReporter} from '../telemetry/telemetry-reporter';
 import {Task, task} from 'fp-ts/lib/Task';
 import {getOptionM} from 'fp-ts/lib/OptionT';
 
@@ -20,11 +18,9 @@ interface DecorationUpdateActionQuickPickItem extends QuickPickItem {
 
 export default class DecorationVariationReader {
     private readonly windowComponent: WindowComponent;
-    private telemetryReporter: TelemetryReporter;
 
     constructor(windowComponent: WindowComponent) {
         this.windowComponent = windowComponent;
-        this.telemetryReporter = TelemetryReporterLocator.getReporter();
     }
 
     read(currentDecoration: Decoration): Task<Option<Decoration>> {
@@ -35,7 +31,6 @@ export default class DecorationVariationReader {
     }
 
     private createDecoration(currentDecoration: Decoration, item: DecorationUpdateActionQuickPickItem): Task<Option<Decoration>> {
-        this.telemetryReporter.logHighlightUpdated(item.actionId);
         switch (item.actionId) {
             case DecorationAction.TOGGLE_CASE_SENSITIVITY:
                 return task.of(some(currentDecoration.withCaseSensitivityToggled()));

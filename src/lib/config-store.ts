@@ -72,7 +72,6 @@ export default class ConfigStore {
         return extensionConfig.get(configName) as T;
     }
 
-    // TODO: Move this to WorkspaceAdaptor
     set(configName: string, configValue: any): Task<O.Option<never>> {
         return getOptionM(task).chain(this.configTargetPicker.pick(), target => {
             const extensionConfig = this.workspace.getConfiguration(Const.EXTENSION_ID);
