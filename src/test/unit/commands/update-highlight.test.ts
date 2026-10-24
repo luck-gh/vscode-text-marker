@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import {some, none} from 'fp-ts/lib/Option';
 import {task} from 'fp-ts/lib/Task';
+import ConfigStore from '../../../lib/config-store';
+import WindowComponent from '../../../lib/vscode/window';
 import UpdateHighlightCommand from '../../../lib/commands/update-highlight';
 import DecorationOperatorFactory from '../../../lib/decoration/decoration-operator-factory';
 import DecorationOperator from '../../../lib/decoration/decoration-operator';
@@ -24,6 +26,8 @@ suite('UpdateHighlightCommand', () => {
         let read = 0;
         const updates: Decoration[][] = [];
         const additions: any[] = [];
+        const errors: string[] = [];
+        const config = mockType<ConfigStore>({highlightColors: ['#00BCD4']});
         const locations = new TextLocationRegistry();
         for (const id of ids) locations.register('editor', id, [{start: 0, end: 6}]);
         const command = new UpdateHighlightCommand(
@@ -43,9 +47,10 @@ suite('UpdateHighlightCommand', () => {
                 return task.of(canceled ? none : some(replacement));
             }}), locations,
             mockType<DecorationPicker>({pickForEdit: () => {picked++;return task.of(canceled && !create ? none : some(create ? 'create' : initial));}}),
-            new PatternFactory(mockType<MatchingModeRegistry>({mode: {ignoreCase: false, wholeMatch: false}}))
+            new PatternFactory(mockType<MatchingModeRegistry>({mode: {ignoreCase: false, wholeMatch: false}})), config,
+            mockType<WindowComponent>({showErrorMessage: (message: string) => () => {errors.push(message);return Promise.resolve('');}})
         );
-        return {command, initial, updates, additions, get picked() {return picked;}, get read() {return read;}};
+        return {command, initial, updates, additions, config, errors, get picked() {return picked;}, get read() {return read;}};
     }
     const editor = mockType<TextEditor>({id: 'editor', selection: {start: 0, end: 6}});
     test('opens the uniquely matched rule directly and preserves its identity and color', async () => {
@@ -86,6 +91,32 @@ suite('UpdateHighlightCommand', () => {
         assert.equal(h.read, 1);
         assert.equal(h.additions.length, 0);
         assert.equal(h.updates.length, 0);
+    });
+    test('rejects creation for an empty current palette and can create after it is restored', async () => {
+        const h = harness([], false, true);
+        h.config.highlightColors.length = 0;
+        await h.command.execute(editor);
+        assert.equal(h.additions.length, 0);
+        assert.equal(h.updates.length, 0);
+        assert.deepEqual(h.errors, ['Add at least one color to textmarker.highlightColors before adding a highlight rule.']);
+        h.config.highlightColors.push('#00BCD4');
+        await h.command.execute(editor);
+        assert.equal(h.additions.length, 1);
+    });
+    test('canceled creation with an empty palette does not notify or allocate', async () => {
+        const h = harness([], true, true);
+        h.config.highlightColors.length = 0;
+        await h.command.execute(editor);
+        assert.equal(h.additions.length, 0);
+        assert.equal(h.errors.length, 0);
+    });
+    test('allows editing an existing rule while its configured palette is empty', async () => {
+        const h = harness(['original']);
+        h.config.highlightColors.length = 0;
+        await h.command.execute(editor);
+        assert.equal(h.updates.length, 1);
+        assert.equal(h.errors.length, 0);
+        assert.equal(h.updates[0][1].colour, h.initial.colour);
     });
     test('leaves the existing rule untouched on input cancellation', async () => {
         const h = harness(['original'], true);

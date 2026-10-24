@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.14.1] - 2026-10-25
 
 - Fixed creation from Edit Highlight Rules when no rules exist. The edit picker previously only accepted existing rules and showed a no-highlights message; its first row now offers Add rule and opens the existing three-button input. Unique matches still open directly. Enter commits, Esc leaves rules and color allocation untouched.
+- Reject creation from Add rule with an explicit localized error when the current palette is empty, without allocating a rule or color. Existing-rule editing and the general default-color allocation contract are unchanged.
 - Restored the existing next/previous same-highlight commands to the context menu, their configuration schema and default visibility, keeping the original cyclic navigation behavior. Updated English, Simplified Chinese and Traditional Chinese entry points and bilingual setup documentation.
-- Validation: compile, lint and unit/acceptance tests; targeted real VS Code 1.108.2 host checks for creation, cancellation, all three input switches, invalid regex, navigation and localized menu labels. Host checks use isolated profiles; no RF/device testing or older VS Code runtime certification is implied.
+- Validation: compile, lint and unit/acceptance tests; targeted real VS Code 1.108.2 host checks for creation, cancellation, all three input switches, invalid regex, navigation and localized menu labels. Host checks use isolated profiles; older VS Code runtimes are not certified by these checks.
 
 ## [1.14.0] - 2026-10-25
 ### Added

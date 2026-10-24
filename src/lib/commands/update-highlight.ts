@@ -1,4 +1,6 @@
 import {l10n} from 'vscode';
+import ConfigStore from '../config-store';
+import WindowComponent from '../vscode/window';
 import DecorationOperatorFactory from '../decoration/decoration-operator-factory';
 import DecorationRegistry from '../decoration/decoration-registry';
 import DecorationPicker from '../decoration/decoration-picker';
@@ -18,7 +20,9 @@ export default class UpdateHighlightCommand implements CommandLike {
                 private readonly patternReader: PatternReader,
                 private readonly textLocationRegistry: TextLocationRegistry,
                 private readonly decorationPicker: DecorationPicker,
-                private readonly patternFactory: PatternFactory) {}
+                private readonly patternFactory: PatternFactory,
+                private readonly configStore: ConfigStore,
+                private readonly windowComponent: WindowComponent) {}
 
     execute(textEditor: TextEditor) {
         const ids = this.textLocationRegistry.queryDecorationIds(textEditor.id, textEditor.selection);
@@ -28,6 +32,10 @@ export default class UpdateHighlightCommand implements CommandLike {
         return getOptionM(task).chain(decoration, current =>
             getOptionM(task).map(this.patternReader.read(current === 'create'
                 ? this.patternFactory.create({type: 'RegExp', phrase: ''}) : current.pattern), pattern => {
+                if (current === 'create' && !this.configStore.highlightColors.length) {
+                    this.windowComponent.showErrorMessage(l10n.t('Add at least one color to textmarker.highlightColors before adding a highlight rule.'))();
+                    return;
+                }
                 const operator = this.decorationOperatorFactory.createForVisibleEditors();
                 if (current === 'create') operator.addDecoration(pattern);
                 else operator.updateDecoration(current, current.withPattern(pattern));

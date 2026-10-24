@@ -109,7 +109,9 @@ export default class CommandFactory {
             new PatternReader(this.getWindowComponent()),
             this.getTextLocationRegistry(),
             this.getDecorationPicker(),
-            new PatternFactory(this.getMatchingModeRegistry())
+            new PatternFactory(this.getMatchingModeRegistry()),
+            this.getConfigStore(),
+            this.getWindowComponent()
         );
     }
 

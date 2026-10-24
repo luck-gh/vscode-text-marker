@@ -31,5 +31,6 @@
   "Match whole words: On (click to turn off)": "Match whole words: On (click to turn off)",
   "Match whole words: Off (click to turn on)": "Match whole words: Off (click to turn on)",
   "This palette color is no longer available. Check textmarker.highlightColors.": "This palette color is no longer available. Check textmarker.highlightColors.",
-  "Add rule": "Add rule"
+  "Add rule": "Add rule",
+  "Add at least one color to textmarker.highlightColors before adding a highlight rule.": "Add at least one color to textmarker.highlightColors before adding a highlight rule."
 }

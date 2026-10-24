@@ -69,7 +69,7 @@ Personal VS Code profiles, settings and windows are not used by this test.
 For the 1.14.1 creation/navigation fix, append `rule-navigation` after the locale to run only the targeted path:
 `node scripts/host-smoke.cjs <package.vsix> <path-to-Code-executable> <locale> rule-navigation`.
 This mode checks the first Add rule entry with zero/existing rules, picker and input cancellation,
-literal array text creation with all three switches, saved modes/color allocation, unique direct editing,
+literal array text creation with all three switches, empty-palette rejection without allocation, saved modes/color allocation, unique direct editing,
 invalid-regex rejection, both navigation directions including wraparound and no-rule behavior,
 and the six localized context entries with default navigation visibility and functioning hide settings.
 It uses the same isolated installer, language-pack bootstrap and renderer capture as the full mode.

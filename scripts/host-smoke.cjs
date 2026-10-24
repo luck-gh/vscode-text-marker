@@ -188,6 +188,11 @@ async function runRuleNavigationHost(vscode, root, extension, report, step) {
         await until(() => fs.existsSync(path.join(root, name + '.continue')), name + ' renderer completion');
     };
     await step('targeted-ready');
+    const palette = settings.get('highlightColors');
+    await settings.update('highlightColors', [], vscode.ConfigurationTarget.Global);
+    await input('create-empty-palette');
+    await step('empty-creation-rejected');
+    await settings.update('highlightColors', palette, vscode.ConfigurationTarget.Global);
     await input('create-picker-cancel');
     await input('create-input-cancel');
     await input('create-literal');
@@ -264,6 +269,13 @@ async function runRuleNavigationUI(cdp, root, locale, manifest, stage, release) 
     await stage('targeted-ready');
     await cdp.evaluate(`window.__textMarkerQuery = function query(selector, root=document) {const result=[...root.querySelectorAll(selector)];for(const e of root.querySelectorAll('*')) if(e.shadowRoot) result.push(...query(selector,e.shadowRoot));return result;};true`);
     release('targeted-ready');
+    assert.equal((await picker('create-empty-palette')).length, 1);
+    await cdp.key('Enter', 'Enter', 13);await input(locales[locale].regex);
+    await setInput('rejected-empty-palette');await accept();release('create-empty-palette');
+    await stage('empty-creation-rejected');
+    await until(async () => cdp.evaluate(`window.__textMarkerQuery('.notification-list-item-message').some(e=>e.textContent===${JSON.stringify(runtime['Add at least one color to textmarker.highlightColors before adding a highlight rule.'])})`), 'localized empty creation palette error');
+    assert.equal(await cdp.evaluate(`document.querySelectorAll('.monaco-editor [class*="TextEditorDecorationType"]').length`), 0, 'Rejected creation leaves no decorations');
+    await cdp.screenshot(path.join(root, 'empty-creation-palette-error.png'));release('empty-creation-rejected');
     assert.equal((await picker('create-picker-cancel')).length, 1);
     await cdp.key('Escape', 'Escape', 27);await closed();release('create-picker-cancel');
     assert.equal((await picker('create-input-cancel')).length, 1);
