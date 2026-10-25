@@ -5,6 +5,11 @@ All notable changes to "Text Marker Custom" extension will be documented in this
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.14.3] - 2026-10-25
+
+- Updated the extension icon to show text lines with clearly outlined, colored highlight segments.
+- Kept all declared production dependencies in the VSIX package.
+
 ## [1.14.2] - 2026-10-25
 
 - Updated the extension icon to show text lines with clearly outlined, colored highlight segments.

@@ -1,8 +1,8 @@
 # Text Marker Custom
 
-简体中文 | [English](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.2/README.en.md)
+简体中文 | [English](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.3/README.en.md)
 
-![Text Marker Custom](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.2/images/text-marker-custom.png)
+![Text Marker Custom](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.3/images/text-marker-custom.png)
 
 可配置色板的文本高亮, 可调边框和圆角, 支持英文与简繁中文界面. 选中 `au8_data[0]` 等文本即可高亮完整匹配项, 也可以使用正则表达式.
 
@@ -12,7 +12,7 @@
 
 ## 安装与原版迁移
 
-需要 VS Code 1.73 或更高版本. 可从 [GitHub Release](https://github.com/luck-gh/vscode-text-marker/releases/tag/v1.14.2) 下载 VSIX, 执行 `Extensions: Install from VSIX...` 安装. Marketplace 发布后也可按 ID `luck-gh.text-marker-custom` 查找安装.
+需要 VS Code 1.73 或更高版本. 可从 [GitHub Release](https://github.com/luck-gh/vscode-text-marker/releases/tag/v1.14.3) 下载 VSIX, 执行 `Extensions: Install from VSIX...` 安装. Marketplace 发布后也可按 ID `luck-gh.text-marker-custom` 查找安装.
 
 切换前先禁用或卸载原版 `ryu1kn.text-marker`. 两个版本沿用同一套 `textmarker.*` 命令和设置, 不能同时启用. 已保存的高亮规则, 个人调色板和自定义快捷键继续使用原标识符. 安装不会重写用户配置; 旧版仍在运行的窗口需要执行 `Developer: Reload Window`.
 
@@ -109,21 +109,21 @@
 
 第一张动图中的旧切换命令会在第二次调用时移除高亮. 从 1.13.0 起, **切换高亮颜色** 执行添加或循环换色; 取消请使用 **取消高亮** (推荐 Ctrl+Alt+H). 原动图也未展示当前配置驱动的序号颜色子菜单与样式.
 
-![原作者演示: 高亮与取消高亮](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.2/images/animations/public.gif)
+![原作者演示: 高亮与取消高亮](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.3/images/animations/public.gif)
 
 大小写与整词匹配:
 
-![原作者演示: 匹配模式](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.2/images/animations/ignore-case-and-whole-match.gif)
+![原作者演示: 匹配模式](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.3/images/animations/ignore-case-and-whole-match.gif)
 
 编辑已有规则:
 
 此原版动图中的独立操作选择步骤已在 1.14.0 删除; 当前直接打开带 `Aa` / `Ab|` / `.*` 按钮的规则输入框.
 
-![原作者演示: 编辑高亮规则](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.2/images/animations/update-highlight.gif)
+![原作者演示: 编辑高亮规则](https://raw.githubusercontent.com/luck-gh/vscode-text-marker/v1.14.3/images/animations/update-highlight.gif)
 
 ## 开发, 反馈与许可
 
 - [提交问题](https://github.com/luck-gh/vscode-text-marker/issues).
-- [构建与测试说明](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.2/CONTRIBUTING.md), 包含编译, 模拟测试和隔离的三语真实宿主验收.
-- [更新记录](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.2/CHANGELOG.md).
-- [MIT 许可证](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.2/LICENSE.txt), 保留 `Copyright (c) 2016 Ryuichi Inagaki`.
+- [构建与测试说明](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.3/CONTRIBUTING.md), 包含编译, 模拟测试和隔离的三语真实宿主验收.
+- [更新记录](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.3/CHANGELOG.md).
+- [MIT 许可证](https://github.com/luck-gh/vscode-text-marker/blob/v1.14.3/LICENSE.txt), 保留 `Copyright (c) 2016 Ryuichi Inagaki`.
