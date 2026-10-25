@@ -1,14 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
   <title id="title">Text Marker Custom</title>
-  <desc id="desc">An original white highlighter above cyan, pink and yellow text marks on a dark rounded tile.</desc>
+  <desc id="desc">Four short lines of text on a dark rounded tile, each with a colored, outlined highlight segment.</desc>
   <rect x="8" y="8" width="240" height="240" rx="52" fill="#0F172A"/>
-  <path d="M48 129h98" fill="none" stroke="#22D3EE" stroke-width="18" stroke-linecap="round"/>
-  <path d="M48 166h155" fill="none" stroke="#F472B6" stroke-width="18" stroke-linecap="round"/>
-  <path d="M48 203h102" fill="none" stroke="#FACC15" stroke-width="18" stroke-linecap="round"/>
-  <g transform="rotate(42 172 82)">
-    <path d="M164 26h16a10 10 0 0 1 10 10v67l-18 24-18-24V36a10 10 0 0 1 10-10z" fill="#F8FAFC"/>
-    <path d="M164 26h16a10 10 0 0 1 10 10v8h-36v-8a10 10 0 0 1 10-10z" fill="#22D3EE"/>
-    <path d="M160 106h24l-12 16z" fill="#FACC15"/>
-    <path d="M164 55v34" fill="none" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+  <g fill="none" stroke="#CBD5E1" stroke-width="12" stroke-linecap="round">
+    <path d="M48 76h160"/>
+    <path d="M48 111h138"/>
+    <path d="M48 146h154"/>
+    <path d="M48 181h126"/>
+  </g>
+  <g stroke-width="4">
+    <rect x="98" y="67" width="48" height="18" rx="5" fill="#22D3EE" fill-opacity=".22" stroke="#22D3EE"/>
+    <rect x="139" y="102" width="43" height="18" rx="5" fill="#5C8DFF" fill-opacity=".24" stroke="#5C8DFF"/>
+    <rect x="75" y="137" width="45" height="18" rx="5" fill="#FFEB3B" fill-opacity=".24" stroke="#FFEB3B"/>
+    <rect x="112" y="172" width="42" height="18" rx="5" fill="#AB47BC" fill-opacity=".26" stroke="#AB47BC"/>
   </g>
 </svg>

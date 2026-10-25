@@ -5,6 +5,10 @@ All notable changes to "Text Marker Custom" extension will be documented in this
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.14.2] - 2026-10-25
+
+- Updated the extension icon to show text lines with clearly outlined, colored highlight segments.
+
 ## [1.14.1] - 2026-10-25
 
 - Fixed creation from Edit Highlight Rules when no rules exist. The edit picker previously only accepted existing rules and showed a no-highlights message; its first row now offers Add rule and opens the existing three-button input. Unique matches still open directly. Enter commits, Esc leaves rules and color allocation untouched.
